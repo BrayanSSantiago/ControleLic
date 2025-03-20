@@ -1,4 +1,4 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize'
 
 export const Edital = database.define('Edital', {
   id: {
@@ -141,7 +141,19 @@ export const Licitacao = database.define('Licitacao', {
   timestamps: false,
 })
 
-export const User = database.define('User', {
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>>{
+  declare id: number
+
+  declare username: string
+
+  declare password: string
+
+  declare email: string
+
+  declare avatar?: string
+}
+
+User.init({
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -152,7 +164,7 @@ export const User = database.define('User', {
     allowNull: false,
     unique: true,
   },
-  password: {
+  password: { // 🔹 Agora está corretamente tipado
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -161,11 +173,12 @@ export const User = database.define('User', {
     allowNull: false,
     unique: true,
   },
-  avatar: { // Nome em minúsculo para consistência
+  avatar: {
     type: DataTypes.STRING,
-    allowNull: true, // Se você deseja que o avatar seja opcional
+    allowNull: true,
   },
 }, {
-  tableName: 'usuarios', // Nome da tabela no banco de dados
-  timestamps: false, // Se você não está usando colunas de timestamp como createdAt e updatedAt
+  sequelize: database,
+  tableName: 'usuarios',
+  timestamps: false,
 })

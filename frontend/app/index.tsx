@@ -7,16 +7,37 @@ export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    if (username === "admin" && password === "1234") {
+  const handleLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ usuario: username, senha: password }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        alert("Erro: " + (data.message || "Falha ao fazer login"));
+        return;
+      }
+  
+      alert("Login realizado com sucesso!");
+  
+      // Armazena o token para autenticação
+      localStorage.setItem("token", data.token);
+  
+      // Redireciona para o dashboard
       router.push("/dashboard");
-    } else {
-      alert("Usuário ou senha incorretos!");
+  
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Erro ao conectar ao servidor.");
     }
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-gray-100 px-4">
+    <View className="items-center justify-center flex-1 px-4 bg-gray-100">
       {/* Logo e Nome TechFund */}
       <View className="items-center mb-6">
       <Image
@@ -27,15 +48,15 @@ export default function LoginScreen() {
       </View>
 
       {/* Card de Login */}
-      <View className="w-full max-w-lg bg-white p-8 rounded-xl shadow-xl">
-        <Text className="text-2xl font-bold text-center text-gray-800 mb-6">
+      <View className="w-full max-w-lg p-8 bg-white shadow-xl rounded-xl">
+        <Text className="mb-6 text-2xl font-bold text-center text-gray-800">
           Controle de Licitações
         </Text>
 
         {/* Input Usuário */}
         <TextInput
           placeholder="Usuário"
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-4 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={username}
           onChangeText={setUsername}
         />
@@ -44,24 +65,24 @@ export default function LoginScreen() {
         <TextInput
           placeholder="Senha"
           secureTextEntry
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-6 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-6 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={password}
           onChangeText={setPassword}
         />
 
         {/* Botão de Login */}
         <TouchableOpacity
-          className="bg-blue-500 px-6 py-3 rounded-lg w-full hover:bg-blue-600 transition-all duration-200"
+          className="w-full px-6 py-3 transition-all duration-200 bg-blue-500 rounded-lg hover:bg-blue-600"
           onPress={handleLogin}
         >
-          <Text className="text-white text-center font-semibold text-lg">
+          <Text className="text-lg font-semibold text-center text-white">
             Entrar
           </Text>
         </TouchableOpacity>
-        <View className="mt-4 flex-row justify-center">
+        <View className="flex-row justify-center mt-4">
           <Text className="text-gray-600">Não possui uma conta? </Text>
         <TouchableOpacity onPress={() => router.push("/cadastro")}>
-          <Text className="text-blue-500 underline font-medium">Crie uma</Text>
+          <Text className="font-medium text-blue-500 underline">Crie uma</Text>
         </TouchableOpacity>
         </View>
       </View>

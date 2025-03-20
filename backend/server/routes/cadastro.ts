@@ -14,5 +14,5 @@ export default defineEventHandler(async event => {
 
   await User.create({ username: usuario, email, password: hashedPassword })
 
-  return 'Usuário cadastrado com sucesso!'
+  return { message: 'Usuário cadastrado com sucesso!' }
 })

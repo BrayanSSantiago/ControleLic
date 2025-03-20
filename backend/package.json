@@ -8,6 +8,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "jsonwebtoken": "^9.0.2"
+  },
   "devDependencies": {
     "@dethdkn/eslint-config": "^2.2.0",
     "bcrypt": "^5.1.1",
@@ -16,10 +21,5 @@
     "nitropack": "latest",
     "sequelize": "^6.37.6",
     "zod": "^3.24.2"
-  },
-  "dependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.9",
-    "jsonwebtoken": "^9.0.2"
   }
 }

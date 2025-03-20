@@ -21,10 +21,10 @@ export default function RegisterScreen() {
     }
   
     try {
-      const response = await fetch("http://localhost:3000/api/cadastro", {
+      const response = await fetch("http://localhost:3000/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, confirmPassword }),
+        body: JSON.stringify({ usuario:username, email:email, senha:password, repetirSenha:confirmPassword }),
       });
   
       const data = await response.json();
@@ -43,7 +43,7 @@ export default function RegisterScreen() {
   };
 
   return (
-    <View className="flex-1 items-center justify-center bg-gray-100 px-4">
+    <View className="items-center justify-center flex-1 px-4 bg-gray-100">
       {/* Logo e Nome TechFund */}
       <View className="items-center mb-6">
         <Image
@@ -54,15 +54,15 @@ export default function RegisterScreen() {
       </View>
 
       {/* Card de Cadastro */}
-      <View className="w-full max-w-lg bg-white p-8 rounded-xl shadow-xl">
-        <Text className="text-2xl font-bold text-center text-gray-800 mb-6">
+      <View className="w-full max-w-lg p-8 bg-white shadow-xl rounded-xl">
+        <Text className="mb-6 text-2xl font-bold text-center text-gray-800">
           Criar Conta
         </Text>
 
         {/* Input Usuário */}
         <TextInput
           placeholder="Usuário"
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-4 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={username}
           onChangeText={setUsername}
         />
@@ -70,7 +70,7 @@ export default function RegisterScreen() {
         {/* Input Email */}
         <TextInput
           placeholder="Email"
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-4 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={email}
           onChangeText={setEmail}
         />
@@ -79,7 +79,7 @@ export default function RegisterScreen() {
         <TextInput
           placeholder="Senha"
           secureTextEntry
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-4 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-4 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={password}
           onChangeText={setPassword}
         />
@@ -88,26 +88,26 @@ export default function RegisterScreen() {
         <TextInput
           placeholder="Confirmar Senha"
           secureTextEntry
-          className="w-full border border-gray-300 rounded-md px-4 py-3 mb-6 text-black focus:border-blue-500"
+          className="w-full px-4 py-3 mb-6 text-black border border-gray-300 rounded-md focus:border-blue-500"
           value={confirmPassword}
           onChangeText={setConfirmPassword}
         />
 
         {/* Botão de Cadastro */}
         <TouchableOpacity
-          className="bg-blue-500 px-6 py-3 rounded-lg w-full hover:bg-blue-600 transition-all duration-200"
+          className="w-full px-6 py-3 transition-all duration-200 bg-blue-500 rounded-lg hover:bg-blue-600"
           onPress={() => handleRegister()} // Certifique-se de que está chamando corretamente
         >
-          <Text className="text-white text-center font-semibold text-lg">
+          <Text className="text-lg font-semibold text-center text-white">
             Cadastrar
           </Text>
         </TouchableOpacity>
 
         {/* Texto "Já tem uma conta?" + Botão "Faça login" */}
-        <View className="mt-4 flex-row justify-center">
+        <View className="flex-row justify-center mt-4">
           <Text className="text-gray-600">Já tem uma conta? </Text>
           <TouchableOpacity onPress={() => router.push("/")}>
-            <Text className="text-blue-500 underline font-medium">Faça login</Text>
+            <Text className="font-medium text-blue-500 underline">Faça login</Text>
           </TouchableOpacity>
         </View>
       </View>
