@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError } from 'h3'
-import Edital from '../models/editais' // Certifique-se de que o caminho está correto
+import Edital from '../../../backend/models/editais' // Certifique-se de que o caminho está correto
 
 export default defineEventHandler(async event => {
   try {

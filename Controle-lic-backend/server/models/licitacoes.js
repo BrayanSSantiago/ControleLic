@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize'
-import sequelize from '../config/database.js' // ou o caminho correto para o arquivo de configuração do banco
+import sequelize from '../../Controle-lic-backend/server/config/database.js' // ou o caminho correto para o arquivo de configuração do banco
 
 const Licitacao = sequelize.define('Licitacao', {
   id: {

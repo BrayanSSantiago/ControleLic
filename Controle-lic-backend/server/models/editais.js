@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize'
-import sequelize from '../config/database.js' // Assumindo que esse arquivo contém a configuração e a instância do Sequelize
+import sequelize from '../../Controle-lic-backend/server/config/database.js' // Assumindo que esse arquivo contém a configuração e a instância do Sequelize
 
 const Edital = sequelize.define('Edital', {
   id: {
