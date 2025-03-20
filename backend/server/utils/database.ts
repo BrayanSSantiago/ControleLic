@@ -5,4 +5,4 @@ const sequelize = new Sequelize('techfund', 'root', '', {
   dialect: 'mysql',
 })
 
-export default sequelize // Corrigido para exportar o sequelize como padrão
+export default sequelize

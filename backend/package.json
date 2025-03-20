@@ -4,14 +4,22 @@
     "build": "nitro build",
     "dev": "nitro dev",
     "prepare": "nitro prepare",
-    "preview": "node .output/server/index.mjs"
+    "preview": "node .output/server/index.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "nitropack": "latest"
-  },
-  "dependencies": {
+    "@dethdkn/eslint-config": "^2.2.0",
     "bcrypt": "^5.1.1",
+    "eslint": "^9.22.0",
+    "mysql2": "^3.14.0",
+    "nitropack": "latest",
     "sequelize": "^6.37.6",
     "zod": "^3.24.2"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
+    "jsonwebtoken": "^9.0.2"
   }
 }
