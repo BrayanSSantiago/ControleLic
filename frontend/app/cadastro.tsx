@@ -9,13 +9,37 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    if (!username || !email || !password || !confirmPassword) {
+      alert("Todos os campos são obrigatórios!");
+      return;
+    }
+  
     if (password !== confirmPassword) {
       alert("As senhas não coincidem!");
       return;
     }
-    alert("Cadastro realizado com sucesso!");
-    router.push("/"); // Redireciona para o login após o cadastro
+  
+    try {
+      const response = await fetch("http://localhost:3000/api/cadastro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password, confirmPassword }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        alert("Erro: " + data.message);
+        return;
+      }
+  
+      alert("Cadastro realizado com sucesso!");
+      router.push("/"); // Redireciona para login após cadastro
+    } catch (error) {
+      console.error("Erro ao registrar:", error);
+      alert("Erro ao conectar ao servidor.");
+    }
   };
 
   return (
@@ -72,7 +96,7 @@ export default function RegisterScreen() {
         {/* Botão de Cadastro */}
         <TouchableOpacity
           className="bg-blue-500 px-6 py-3 rounded-lg w-full hover:bg-blue-600 transition-all duration-200"
-          onPress={handleRegister}
+          onPress={() => handleRegister()} // Certifique-se de que está chamando corretamente
         >
           <Text className="text-white text-center font-semibold text-lg">
             Cadastrar
@@ -82,7 +106,7 @@ export default function RegisterScreen() {
         {/* Texto "Já tem uma conta?" + Botão "Faça login" */}
         <View className="mt-4 flex-row justify-center">
           <Text className="text-gray-600">Já tem uma conta? </Text>
-          <TouchableOpacity onPress={() => router.push("/login")}>
+          <TouchableOpacity onPress={() => router.push("/")}>
             <Text className="text-blue-500 underline font-medium">Faça login</Text>
           </TouchableOpacity>
         </View>
