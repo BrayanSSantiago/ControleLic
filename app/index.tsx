@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function LoginScreen() {
@@ -17,10 +17,18 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 items-center justify-center bg-gray-100 px-4">
-     
-      <View className="w-full max-w-lg bg-white p-8 rounded-xl shadow-xl ">
-        {/* Título */}
-        <Text className="text-3xl font-bold text-center text-gray-800 mb-6">
+      {/* Logo e Nome TechFund */}
+      <View className="items-center mb-6">
+      <Image
+      source={require("../assets/images/logo.png")}
+      style={{ width: 200, height: 200, marginBottom: 16 }} // w-24 h-24 em Tailwind equivale a 96px
+      resizeMode="contain"
+      />
+      </View>
+
+      {/* Card de Login */}
+      <View className="w-full max-w-lg bg-white p-8 rounded-xl shadow-xl">
+        <Text className="text-2xl font-bold text-center text-gray-800 mb-6">
           Controle de Licitações
         </Text>
 
@@ -50,6 +58,12 @@ export default function LoginScreen() {
             Entrar
           </Text>
         </TouchableOpacity>
+        <View className="mt-4 flex-row justify-center">
+          <Text className="text-gray-600">Não possui uma conta? </Text>
+        <TouchableOpacity onPress={() => router.push("/cadastro")}>
+          <Text className="text-blue-500 underline font-medium">Crie uma</Text>
+        </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
