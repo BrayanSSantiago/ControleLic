@@ -1,6 +1,6 @@
 import { defineEventHandler, sendError } from 'h3'
-import LicitacaoModel from '../../../backend/models/licitacoes.js' // Certifique-se de que o caminho está correto
 import { Op } from 'sequelize' // Importação do operador para consultas dinâmicas
+import LicitacaoModel from '../../../backend/models/licitacoes.js' // Certifique-se de que o caminho está correto
 
 export default defineEventHandler(async event => {
   try {
