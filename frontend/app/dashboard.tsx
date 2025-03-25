@@ -16,6 +16,8 @@ export default function DashboardScreen() {
   const [loading, setLoading] = useState(false)
   const [licitacoes, setLicitacoes] = useState<any[]>([])
   const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({})
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   const [filtros, setFiltros] = useState({
     objeto: "",
@@ -39,10 +41,15 @@ export default function DashboardScreen() {
   const fetchLicitacoes = async () => {
     try {
       setLoading(true)
-      const params = new URLSearchParams(filtros as any).toString()
+      const params = new URLSearchParams({
+      ...filtros,
+      page: page.toString(),
+      limit: "10", // ou qualquer outro número de itens por página
+    })
       const response = await fetch(`http://localhost:3000/licitacoes?${params}`)
       const data = await response.json()
       setLicitacoes(data.data || [])
+      setTotalPages(data.pagination.totalPages)
     } catch (error) {
       console.error("Erro ao buscar licitações:", error)
     } finally {
@@ -51,13 +58,14 @@ export default function DashboardScreen() {
   }
 
   const aplicarFiltros = () => {
+    setPage(1) // <- voltar para a primeira página ao aplicar filtros
     fetchLicitacoes()
     setModalVisible(false)
   }
 
   useEffect(() => {
     fetchLicitacoes()
-  }, [])
+  }, [page])
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -234,6 +242,27 @@ export default function DashboardScreen() {
           ))
         )}
       </ScrollView>
+    {/* Paginação */}
+    <View className="flex-row items-center justify-between mt-4">
+        <TouchableOpacity
+          className="px-4 py-2 bg-gray-300 rounded"
+          onPress={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          <Text>Anterior</Text>
+        </TouchableOpacity>
+
+        <Text className="text-sm text-gray-600">Página {page} de {totalPages}</Text>
+
+        <TouchableOpacity
+          className="px-4 py-2 bg-gray-300 rounded"
+          onPress={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          <Text>Próxima</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
+

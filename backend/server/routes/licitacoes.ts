@@ -5,30 +5,43 @@ interface QueryParams{
   tipo?: string,
   objeto?: string,
   estado?: string,
+  page?: string,
+  limit?: string,
 }
 
 export default defineEventHandler(async event => {
   const query = getQuery(event) as QueryParams
-  const { numero, tipo, objeto, estado } = query
+  const { numero, tipo, objeto, estado, page = '1', limit } = query
 
   const where: WhereOptions = {}
 
   if(numero) where.numero = { [Op.like]: `%${numero}%` }
-
   if(tipo) where.tipo = tipo
-
   if(objeto) where.objeto = { [Op.like]: `%${objeto}%` }
-
   if(estado) where.local = { [Op.like]: `%/${estado}` }
 
-  const licitacoes = await Licitacao.findAll({ where })
-    .catch(error => {
-      console.error(`Ocorreu um erro ao tentar baixar as licitações do banco de dados ${error}`)
-      throw createError({ status: 500, message: 'Não foi possivel baixar as licitações' })
-    })
+  const pageNumber = Number.parseInt(page)
+  const limitNumber = Number.parseInt(limit)
+  const offset = (pageNumber - 1) * limitNumber
 
-  return {
-    success: true,
-    data: licitacoes,
+  try {
+    const [licitacoes, total] = await Promise.all([
+      Licitacao.findAll({ where, offset, limit: limitNumber }),
+      Licitacao.count({ where }),
+    ])
+
+    return {
+      success: true,
+      data: licitacoes,
+      pagination: {
+        page: pageNumber,
+        totalPages: Math.ceil(total / limitNumber),
+        total,
+      },
+    }
+  }
+  catch (error){
+    console.error('Erro ao buscar licitações:', error)
+    throw createError({ status: 500, message: 'Erro ao buscar licitações' })
   }
 })
