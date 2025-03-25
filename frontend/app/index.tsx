@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../slices/authSlice"; 
+
+
 
 export default function LoginScreen() {
+  const dispatch = useDispatch();
+
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +31,8 @@ export default function LoginScreen() {
       alert("Login realizado com sucesso!");
   
       // Armazena o token para autenticação
-      localStorage.setItem("token", data.token);
+      dispatch(loginSuccess({ token: data.token, user: data.usuario }));
+
   
       // Redireciona para o dashboard
       router.push("/dashboard");

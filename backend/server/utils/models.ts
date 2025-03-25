@@ -54,7 +54,48 @@ export const Favorito = database.define('Favorito', {
   timestamps: false, // Se você não está usando colunas de timestamp como createdAt e updatedAt
 })
 
-export const Licitacao = database.define('Licitacao', {
+export class Licitacao extends Model<InferAttributes<Licitacao>, InferCreationAttributes<Licitacao>>{
+  declare id: number
+
+  declare id_pncp: string
+
+  declare dt_atl: Date | null
+
+  declare link: string
+
+  declare numero: null | string
+
+  declare local: null | string
+
+  declare orgao: null | string
+
+  declare unidade_compradora: null | string
+
+  declare modalidade_contratacao: null | string
+
+  declare amparo_legal: null | string
+
+  declare tipo: null | string
+
+  declare modo_disputa: null | string
+
+  declare registro_preco: null | string
+
+  declare data_divulgacao_pncp: Date | null
+
+  declare situacao: null | string
+
+  declare fonte: null | string
+
+  declare data_inicio_recebimento_propostas: Date | null
+
+  declare data_fim_recebimento_propostas: Date | null
+
+  declare objeto: null | string
+
+  declare valorLicitacao: null | string
+}
+Licitacao.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -137,6 +178,7 @@ export const Licitacao = database.define('Licitacao', {
     allowNull: true,
   },
 }, {
+  sequelize: database,
   tableName: 'licitacoes',
   timestamps: false,
 })

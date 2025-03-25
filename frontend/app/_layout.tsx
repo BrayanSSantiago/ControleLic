@@ -1,8 +1,15 @@
 import { Stack } from "expo-router";
 import '../global.css';
-
-
+import { Provider } from "react-redux";
+import { store } from "../store";
 
 export default function RootLayout() {
-  return <Stack  screenOptions={{ headerShown: false }} />;
-}
+  return(
+     <Provider store={store}>
+       <Stack screenOptions={{ headerShown: false }} />
+     </Provider>
+  )
+ }
+ 
+ 
+ 
