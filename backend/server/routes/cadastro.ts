@@ -13,6 +13,10 @@ export default defineEventHandler(async event => {
   const hashedPassword = await bcrypt.hash(senha, 10)
 
   await User.create({ username: usuario, email, password: hashedPassword })
+    .catch(error => {
+      console.error(`Ocorreu um erro ao cadastrar o usuario no banco de dados ${error}`)
+      throw createError({ status: 500, message: 'Não foi possivel cadastrar o usuario' })
+    })
 
   return { message: 'Usuário cadastrado com sucesso!' }
 })

@@ -1,9 +1,21 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Modal } from "react-native"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  Modal,
+  ActivityIndicator,
+} from "react-native"
 import { Dropdown } from "react-native-element-dropdown"
+import { Ionicons } from "@expo/vector-icons"
 
 export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [licitacoes, setLicitacoes] = useState<any[]>([])
+  const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({})
 
   const [filtros, setFiltros] = useState({
     objeto: "",
@@ -24,9 +36,31 @@ export default function DashboardScreen() {
     { label: "Serviço", value: "Serviço" },
   ]
 
+  const fetchLicitacoes = async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams(filtros as any).toString()
+      const response = await fetch(`http://localhost:3000/licitacoes?${params}`)
+      const data = await response.json()
+      setLicitacoes(data.data || [])
+    } catch (error) {
+      console.error("Erro ao buscar licitações:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const aplicarFiltros = () => {
-    console.log("Filtros aplicados:", filtros)
+    fetchLicitacoes()
     setModalVisible(false)
+  }
+
+  useEffect(() => {
+    fetchLicitacoes()
+  }, [])
+
+  const toggleExpand = (id: string) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
   }
 
   return (
@@ -156,10 +190,49 @@ export default function DashboardScreen() {
 
       {/* Lista de Licitações */}
       <ScrollView className="mt-4">
-        <View className="p-4 mb-4 bg-white rounded-lg shadow">
-          <Text className="font-semibold text-gray-700">Licitacao #12345</Text>
-          <Text className="text-sm text-gray-500">Objeto: Fornecimento de equipamentos...</Text>
-        </View>
+        {loading ? (
+          <ActivityIndicator size="large" color="#3b82f6" />
+        ) : licitacoes.length === 0 ? (
+          <Text className="text-center text-gray-500">Nenhuma licitação encontrada</Text>
+        ) : (
+          licitacoes.map((edital: any) => (
+            <View
+              key={edital.id}
+              className="relative p-4 mb-4 bg-white rounded-lg shadow"
+            >
+              <View className="flex-row justify-between">
+                <View>
+                  <Text className="font-semibold text-gray-700">
+                    Licitação #{edital.numero}
+                  </Text>
+                  <Text className="text-sm text-gray-500 truncate">
+                    Objeto: {edital.objeto}
+                  </Text>
+                </View>
+
+                <TouchableOpacity onPress={() => toggleExpand(edital.id)}>
+                  <Ionicons
+                    name={expanded[edital.id] ? "chevron-up" : "chevron-down"}
+                    size={24}
+                    color="#666"
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {expanded[edital.id] && (
+                <View className="mt-4 space-y-1 text-gray-600">
+                  <Text>Data início: {edital.data_inicio_recebimento_propostas}</Text>
+                  <Text>Data fim: {edital.data_fim_recebimento_propostas}</Text>
+                  <Text>Órgão: {edital.orgao}</Text>
+                  <Text>Local: {edital.local}</Text>
+                  <Text>Tipo: {edital.tipo}</Text>
+                  <Text>Valor: R$ {edital.valorLicitacao}</Text>
+                  <Text>Link: {edital.link}</Text>
+                </View>
+              )}
+            </View>
+          ))
+        )}
       </ScrollView>
     </View>
   )

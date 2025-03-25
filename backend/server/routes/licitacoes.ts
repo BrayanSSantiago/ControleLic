@@ -13,18 +13,13 @@ export default defineEventHandler(async event => {
 
   const where: WhereOptions = {}
 
-  if(numero){
-    where.numero = { [Op.like]: `%${numero}%` }
-  }
-  if(tipo){
-    where.tipo = tipo
-  }
-  if(objeto){
-    where.objeto = { [Op.like]: `%${objeto}%` }
-  }
-  if(estado){
-    where.local = { [Op.like]: `%/${estado}` }
-  }
+  if(numero) where.numero = { [Op.like]: `%${numero}%` }
+
+  if(tipo) where.tipo = tipo
+
+  if(objeto) where.objeto = { [Op.like]: `%${objeto}%` }
+
+  if(estado) where.local = { [Op.like]: `%/${estado}` }
 
   const licitacoes = await Licitacao.findAll({ where })
     .catch(error => {
