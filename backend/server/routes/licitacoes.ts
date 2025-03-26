@@ -7,18 +7,21 @@ interface QueryParams{
   estado?: string,
   page?: string,
   limit?: string,
+  dataInicio?: Date,
+  dataFim?: Date,
 }
 
 export default defineEventHandler(async event => {
   const query = getQuery(event) as QueryParams
-  const { numero, tipo, objeto, estado, page = '1', limit } = query
+  const { numero, tipo, objeto, estado, dataInicio, dataFim, page = '1', limit } = query
 
   const where: WhereOptions = {}
-
   if(numero) where.numero = { [Op.like]: `%${numero}%` }
   if(tipo) where.tipo = tipo
   if(objeto) where.objeto = { [Op.like]: `%${objeto}%` }
   if(estado) where.local = { [Op.like]: `%/${estado}` }
+  if(dataInicio) where.data_inicio_recebimento_propostas = { [Op.like]: `%/${dataInicio}` }
+  if(dataFim) where.data_fim_recebimento_propostas = { [Op.like]: `%/${dataFim}` }
 
   const pageNumber = Number.parseInt(page)
   const limitNumber = Number.parseInt(limit)
