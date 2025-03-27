@@ -7,21 +7,58 @@ interface QueryParams{
   estado?: string,
   page?: string,
   limit?: string,
-  dataInicio?: Date,
-  dataFim?: Date,
+  dataInicio?: string,
+  dataFim?: string,
+  orgao?: string,
+  modalidade_contratacao?: string,
+  unidade_compradora?: string,
+  amparo_legal?: string,
+  modo_disputa?: string,
+  situacao?: string,
+  fonte?: string,
 }
 
 export default defineEventHandler(async event => {
   const query = getQuery(event) as QueryParams
-  const { numero, tipo, objeto, estado, dataInicio, dataFim, page = '1', limit } = query
+
+  const {
+    numero,
+    tipo,
+    objeto,
+    estado,
+    dataInicio,
+    dataFim,
+    page = '1',
+    limit = '10',
+    ...filtrosDinamicos
+  } = query
 
   const where: WhereOptions = {}
+
   if(numero) where.numero = { [Op.like]: `%${numero}%` }
   if(tipo) where.tipo = tipo
   if(objeto) where.objeto = { [Op.like]: `%${objeto}%` }
   if(estado) where.local = { [Op.like]: `%/${estado}` }
-  if(dataInicio) where.data_inicio_recebimento_propostas = { [Op.like]: `%/${dataInicio}` }
-  if(dataFim) where.data_fim_recebimento_propostas = { [Op.like]: `%/${dataFim}` }
+  if(dataInicio) where.data_inicio_recebimento_propostas = { [Op.gte]: dataInicio }
+  if(dataFim) where.data_fim_recebimento_propostas = { [Op.lte]: dataFim }
+
+  // Campos dinâmicos extras
+  const camposExtras = [
+    'orgao',
+    'modalidade_contratacao',
+    'unidade_compradora',
+    'amparo_legal',
+    'modo_disputa',
+    'situacao',
+    'fonte',
+  ] as const
+
+  for(const campo of camposExtras){
+    const valor = filtrosDinamicos[campo]
+    if(valor){
+      where[campo] = valor
+    }
+  }
 
   const pageNumber = Number.parseInt(page)
   const limitNumber = Number.parseInt(limit)

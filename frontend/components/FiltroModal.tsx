@@ -34,7 +34,7 @@ export default function FiltroModal({ visible, onClose, filtros, setFiltros, apl
             className="w-full px-4 py-2 mb-4 text-sm border border-gray-300 rounded"
         />
 
-        <View className="flex-col flex-wrap justify-between w-full gap-y-4">
+        <View className="flex flex-col flex-wrap justify-between w-full gap-y-4">
         {/* Estado */}
         <View className="flex-1 min-w-[30%] max-w-[33%] px-1">
             <Text className="mb-1 text-sm font-medium text-gray-700">Estado</Text>
