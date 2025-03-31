@@ -31,8 +31,10 @@ export default function LoginScreen() {
       alert("Login realizado com sucesso!");
   
       // Armazena o token para autenticação
-      dispatch(loginSuccess({ token: data.token, user: data.usuario }));
-
+      dispatch(loginSuccess({
+        token: data.token,
+        user: data.usuario // ← agora contém { id, username }
+      }))
   
       // Redireciona para o dashboard
       router.push("/dashboard");

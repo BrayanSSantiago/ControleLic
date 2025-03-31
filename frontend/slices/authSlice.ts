@@ -1,7 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+// Defina o tipo correto do usuário
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
 
 interface AuthState {
-  user: string | null;
+  user: { id: number; username: string } | null;
   token: string | null;
   isAuthenticated: boolean;
 }
@@ -16,7 +22,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess: (state, action: PayloadAction<{ user: string; token: string }>) => {
+    loginSuccess: (state, action: PayloadAction<{ user: { id: number; username: string }; token: string }>) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
       state.isAuthenticated = true;

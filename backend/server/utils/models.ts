@@ -27,7 +27,18 @@ export const Edital = database.define('Edital', {
   timestamps: false,
 })
 
-export const Favorito = database.define('Favorito', {
+export class Favorito extends Model<
+  InferAttributes<Favorito>,
+  InferCreationAttributes<Favorito>
+>{
+  declare id: number
+
+  declare user_id: number
+
+  declare licitacao_id: number
+}
+
+Favorito.init({
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -37,7 +48,7 @@ export const Favorito = database.define('Favorito', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'usuarios', // Nome da tabela de usuários
+      model: 'usuarios',
       key: 'id',
     },
   },
@@ -45,13 +56,14 @@ export const Favorito = database.define('Favorito', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'licitacoes', // Nome da tabela de licitações
+      model: 'licitacoes',
       key: 'id',
     },
   },
 }, {
-  tableName: 'favoritos', // Especifica o nome da tabela aqui
-  timestamps: false, // Se você não está usando colunas de timestamp como createdAt e updatedAt
+  sequelize: database,
+  tableName: 'favoritos', // ← Nome da tabela no banco
+  timestamps: false, // Ative se sua tabela tiver createdAt/updatedAt
 })
 
 export class Licitacao extends Model<InferAttributes<Licitacao>, InferCreationAttributes<Licitacao>>{
@@ -224,3 +236,10 @@ User.init({
   tableName: 'usuarios',
   timestamps: false,
 })
+
+// Relacionamentos entre as tabelas
+User.hasMany(Favorito, { foreignKey: 'user_id' })
+Favorito.belongsTo(User, { foreignKey: 'user_id' })
+
+Licitacao.hasMany(Favorito, { foreignKey: 'licitacao_id' })
+Favorito.belongsTo(Licitacao, { foreignKey: 'licitacao_id' })

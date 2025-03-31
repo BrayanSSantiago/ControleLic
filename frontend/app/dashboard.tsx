@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import type { RootState } from '../store'
 import {
   View,
   Text,
@@ -8,7 +9,8 @@ import {
   Linking,
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
-import FiltroModal from "../components/FiltroModal" // componente modularizado
+import { useSelector } from "react-redux"
+import FiltroModal from "../components/FiltroModal"
 
 export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = useState(false)
@@ -17,6 +19,10 @@ export default function DashboardScreen() {
   const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({})
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [favoritos, setFavoritos] = useState<number[]>([])
+
+  const user = useSelector((state: RootState) => state.auth.user)
+  const user_id = user?.id
 
   const [filtros, setFiltros] = useState<{ [key: string]: string }>({
     objeto: "",
@@ -26,9 +32,7 @@ export default function DashboardScreen() {
     dataFim: "",
   })
 
-  const [filtrosDinamicos, setFiltrosDinamicos] = useState<{
-    [key: string]: string[]
-  }>({
+  const [filtrosDinamicos, setFiltrosDinamicos] = useState<{ [key: string]: string[] }>({
     orgao: [],
     modalidade_contratacao: [],
     unidade_compradora: [],
@@ -46,6 +50,7 @@ export default function DashboardScreen() {
     dataFim: "",
   })
 
+  // Busca filtros únicos
   const fetchFiltrosDinamicos = async () => {
     try {
       const res = await fetch("http://localhost:3000/filtros")
@@ -58,6 +63,32 @@ export default function DashboardScreen() {
     }
   }
 
+  // Alterna favorito
+  const toggleFavorito = async (id: number) => {
+    try {
+      const isFavorito = favoritos.includes(id)
+
+      if (isFavorito) {
+        await fetch(`http://localhost:3000/delFavoritos`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, licitacao_id: id }),
+        })
+        setFavoritos(favoritos.filter(fav => fav !== id))
+      } else {
+        await fetch("http://localhost:3000/addFavoritos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, licitacao_id: id }),
+        })
+        setFavoritos([...favoritos, id])
+      }
+    } catch (err) {
+      console.error("Erro ao favoritar:", err)
+    }
+  }
+
+  // Pega licitações
   const fetchLicitacoes = async () => {
     try {
       setLoading(true)
@@ -78,6 +109,7 @@ export default function DashboardScreen() {
     }
   }
 
+  // Aplica os filtros
   const aplicarFiltros = () => {
     setPage(1)
     setFiltrosAtivos({ ...filtros })
@@ -92,8 +124,8 @@ export default function DashboardScreen() {
     fetchFiltrosDinamicos()
   }, [])
 
+  // Garante que os filtros dinâmicos fiquem sincronizados
   useEffect(() => {
-    // Garante que todos os campos dinâmicos estejam em filtros
     const novos = { ...filtros }
     Object.keys(filtrosDinamicos).forEach((campo) => {
       if (!(campo in novos)) {
@@ -102,6 +134,31 @@ export default function DashboardScreen() {
     })
     setFiltros(novos)
   }, [filtrosDinamicos])
+
+  // Buscar favoritos do usuário
+  useEffect(() => {
+    const fetchFavoritos = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/fetchFavoritos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id }),
+        })
+  
+        const json = await res.json()
+  
+        if (json.success) {
+          setFavoritos(json.data || [])
+        } else {
+          console.warn("Resposta de favoritos sem success:", json)
+        }
+      } catch (err) {
+        console.error("Erro ao buscar favoritos:", err)
+      }
+    }
+  
+    if (user_id) fetchFavoritos()
+  }, [user_id])
 
   const toggleExpand = (id: string) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
@@ -121,7 +178,6 @@ export default function DashboardScreen() {
     setFiltrosAtivos(limpo)
     setPage(1)
   }
-
   return (
     <View className="flex-1 px-4 pt-12 bg-gray-100">
       {/* Navbar */}
@@ -186,21 +242,36 @@ export default function DashboardScreen() {
           <Text className="text-center text-gray-500">Nenhuma licitação encontrada</Text>
         ) : (
           licitacoes.map((edital: any) => (
-            <View key={edital.id} className="relative p-4 mb-4 bg-white rounded-lg shadow">
-              <View className="flex-row justify-between">
-                <View>
-                  <Text className="font-semibold text-gray-700">{edital.numero}</Text>
-                  <Text className="text-sm text-gray-500">Objeto: {edital.objeto}</Text>
-                </View>
-                <TouchableOpacity onPress={() => toggleExpand(edital.id)}>
-                  <Ionicons
-                    name={expanded[edital.id] ? "chevron-up" : "chevron-down"}
-                    size={24}
-                    color="#666"
-                  />
-                </TouchableOpacity>
-              </View>
+            <View key={edital.id} className="relative p-4 mb-4 bg-white rounded-lg shadow" >
 
+               {/* Topo do Card com Número, Estrela e Seta */}
+              <View className="flex-row items-start justify-between mb-2">
+                <View className="flex-1 pr-2">
+                  <Text className="font-semibold text-gray-700">{edital.numero}</Text>
+                  <Text className="text-gray-500 break-words">Objeto: {edital.objeto}</Text>
+                </View>
+
+                <View className="flex-row items-start space-x-2">
+                  {/* Ícone de favorito */}
+                  <TouchableOpacity onPress={() => toggleFavorito(edital.id)}>
+                    <Ionicons
+                      name={favoritos.includes(edital.id) ? "star" : "star-outline"}
+                      size={24}
+                      color={favoritos.includes(edital.id) ? "#facc15" : "#999"}
+                    />
+                  </TouchableOpacity>
+
+                  {/* Ícone de expandir */}
+                  <TouchableOpacity onPress={() => toggleExpand(edital.id)}>
+                    <Ionicons
+                      name={expanded[edital.id] ? "chevron-up" : "chevron-down"}
+                      size={24}
+                      color="#666"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            
               {expanded[edital.id] && (
                 <View className="mt-4 space-y-1 text-gray-600">
                   <Text>Data início: {edital.data_inicio_recebimento_propostas}</Text>
