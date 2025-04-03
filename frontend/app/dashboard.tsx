@@ -11,6 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons"
 import { useSelector } from "react-redux"
 import FiltroModal from "../components/FiltroModal"
+import Navbar from "../components/navbar"
+
 
 export default function DashboardScreen() {
   const [modalVisible, setModalVisible] = useState(false)
@@ -181,14 +183,9 @@ export default function DashboardScreen() {
   return (
     <View className="flex-1 px-4 pt-12 bg-gray-100">
       {/* Navbar */}
-      <View className="flex-row items-center justify-between mb-4">
-        <Text className="text-xl font-bold text-blue-600">TechFund</Text>
-        <View className="flex-row justify-center flex-1 ml-4 space-x-4">
-          <Text className="text-base font-semibold text-gray-700">Licitações</Text>
-          <Text className="text-base text-gray-500">Favoritas</Text>
-          <Text className="text-base text-gray-500">Relatório</Text>
-        </View>
-      </View>
+      
+      <Navbar />
+
 
       <View className="h-px mb-4 bg-gray-300 shadow" />
 
