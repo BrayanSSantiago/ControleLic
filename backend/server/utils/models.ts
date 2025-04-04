@@ -36,6 +36,8 @@ export class Favorito extends Model<
   declare user_id: number
 
   declare licitacao_id: number
+
+  declare Licitacao?: Licitacao
 }
 
 Favorito.init({

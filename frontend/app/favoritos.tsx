@@ -26,14 +26,24 @@ export default function FavoritasScreen() {
   const fetchFavoritas = async () => {
     try {
       setLoading(true)
-      const res = await fetch("http://localhost:3000/favoritos/lista", {
+      const res = await fetch("http://localhost:3000/licitacoesFav", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id }),
       })
       const json = await res.json()
-      setLicitacoes(json.data || [])
-      setTotalPages(1) // Paginação futura se necessário
+  
+      if (json.success) {
+        // Aqui você extrai os dados da chave `Licitacao` em cada favorito
+        const licitacoesFavoritas = json.data
+          .map((favorito: any) => favorito.Licitacao)
+          .filter(Boolean) // remove nulos caso alguma associação falhe
+  
+        setLicitacoes(licitacoesFavoritas)
+        setTotalPages(1)
+      } else {
+        console.warn("Resposta sem sucesso:", json)
+      }
     } catch (err) {
       console.error("Erro ao buscar favoritos:", err)
     } finally {
