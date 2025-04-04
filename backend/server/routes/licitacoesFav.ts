@@ -19,6 +19,8 @@ export default defineEventHandler(async event => {
       .map(fav => fav.Licitacao)
       .filter(Boolean)
 
+    console.log('Favoritos:', JSON.stringify(favoritos, null, 2))
+
     return {
       success: true,
       data: licitacoes,
