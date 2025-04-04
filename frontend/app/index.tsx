@@ -15,7 +15,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth", {
+      const response = await fetch("https://techfund.net.br/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario: username, senha: password }),

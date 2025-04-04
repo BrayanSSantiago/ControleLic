@@ -21,7 +21,7 @@ export default function RegisterScreen() {
     }
   
     try {
-      const response = await fetch("http://localhost:3000/cadastro", {
+      const response = await fetch("https://techfund.net.br/api/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario:username, email:email, senha:password, repetirSenha:confirmPassword }),

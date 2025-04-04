@@ -55,7 +55,7 @@ export default function DashboardScreen() {
   // Busca filtros únicos
   const fetchFiltrosDinamicos = async () => {
     try {
-      const res = await fetch("http://localhost:3000/filtros")
+      const res = await fetch("https://techfund.net.br/api/filtros")
       const json = await res.json()
       if (json.success) {
         setFiltrosDinamicos(json.data)
@@ -71,14 +71,14 @@ export default function DashboardScreen() {
       const isFavorito = favoritos.includes(id)
 
       if (isFavorito) {
-        await fetch(`http://localhost:3000/delFavoritos`, {
+        await fetch(`https://techfund.net.br/api/delFavoritos`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
         })
         setFavoritos(favoritos.filter(fav => fav !== id))
       } else {
-        await fetch("http://localhost:3000/addFavoritos", {
+        await fetch("http:https://techfund.net.br/api/addFavoritos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
@@ -100,7 +100,7 @@ export default function DashboardScreen() {
         limit: "10",
       })
 
-      const response = await fetch(`http://localhost:3000/licitacoes?${params}`)
+      const response = await fetch(`https://techfund.net.br/api/licitacoes?${params}`)
       const data = await response.json()
       setLicitacoes(data.data || [])
       setTotalPages(data.pagination.totalPages)
@@ -141,7 +141,7 @@ export default function DashboardScreen() {
   useEffect(() => {
     const fetchFavoritos = async () => {
       try {
-        const res = await fetch("http://localhost:3000/fetchFavoritos", {
+        const res = await fetch("https://techfund.net.br/api/fetchFavoritos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id }),
