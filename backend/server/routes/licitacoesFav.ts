@@ -1,36 +1,50 @@
+import { Op, WhereOptions } from 'sequelize'
+
 export default defineEventHandler(async event => {
   const body = await readBody(event)
-  const { user_id } = body
+  const { user_id, ...filtros } = body
 
   if(!user_id){
-    throw createError({
-      statusCode: 400,
-      message: 'Parâmetro "user_id" é obrigatório',
-    })
+    throw createError({ statusCode: 400, message: 'user_id é obrigatório' })
   }
 
-  try {
-    const favoritos = await Favorito.findAll({
-      where: { user_id },
-      include: [{ model: Licitacao }], // ← funciona porque o relacionamento está feito
-    })
+  const where: WhereOptions = {}
 
-    const licitacoes = favoritos
-      .map(fav => fav.Licitacao)
-      .filter(Boolean)
-
-    console.log('Favoritos:', JSON.stringify(favoritos, null, 2))
-
-    return {
-      success: true,
-      data: licitacoes,
-    }
+  // Filtros básicos
+  if(filtros.objeto){
+    where.objeto = { [Op.like]: `%${filtros.objeto}%` }
   }
-  catch (error){
-    console.error('Erro ao buscar favoritos:', error)
-    throw createError({
-      statusCode: 500,
-      message: 'Erro ao buscar favoritos do usuário',
-    })
+
+  if(filtros.estado){
+    where.local = { [Op.like]: `%/${filtros.estado}` }
+  }
+
+  if(filtros.tipo){
+    where.tipo = filtros.tipo
+  }
+
+  if(filtros.dataInicio){
+    where.data_inicio_recebimento_propostas = { [Op.gte]: filtros.dataInicio }
+  }
+
+  if(filtros.dataFim){
+    where.data_fim_recebimento_propostas = { [Op.lte]: filtros.dataFim }
+  }
+
+  // Aplica os filtros na busca dos favoritos do usuário
+  const favoritos = await Favorito.findAll({
+    where: { user_id },
+    include: [{
+      model: Licitacao,
+      where, // APLICA OS FILTROS NA LICITAÇÃO
+    }],
+  })
+
+  // Mapeia os dados
+  const licitacoes = favoritos.map(fav => fav.Licitacao).filter(Boolean)
+
+  return {
+    success: true,
+    data: licitacoes,
   }
 })

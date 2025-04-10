@@ -15,6 +15,9 @@ import Navbar from "../components/navbar"
 
 
 export default function DashboardScreen() {
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+ 
   const [modalVisible, setModalVisible] = useState(false)
   const [loading, setLoading] = useState(false)
   const [licitacoes, setLicitacoes] = useState<any[]>([])
@@ -55,7 +58,7 @@ export default function DashboardScreen() {
   // Busca filtros únicos
   const fetchFiltrosDinamicos = async () => {
     try {
-      const res = await fetch("https://techfund.net.br/api/filtros")
+      const res = await fetch(`${apiUrl}filtros`)
       const json = await res.json()
       if (json.success) {
         setFiltrosDinamicos(json.data)
@@ -71,14 +74,14 @@ export default function DashboardScreen() {
       const isFavorito = favoritos.includes(id)
 
       if (isFavorito) {
-        await fetch(`https://techfund.net.br/api/delFavoritos`, {
+        await fetch(`${apiUrl}delFavoritos`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
         })
         setFavoritos(favoritos.filter(fav => fav !== id))
       } else {
-        await fetch("https://techfund.net.br/api/addFavoritos", {
+        await fetch("http:https://techfund.net.br/api/addFavoritos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
@@ -100,7 +103,7 @@ export default function DashboardScreen() {
         limit: "10",
       })
 
-      const response = await fetch(`https://techfund.net.br/api/licitacoes?${params}`)
+      const response = await fetch(`${apiUrl}licitacoes?${params}`)
       const data = await response.json()
       setLicitacoes(data.data || [])
       setTotalPages(data.pagination.totalPages)
@@ -141,7 +144,7 @@ export default function DashboardScreen() {
   useEffect(() => {
     const fetchFavoritos = async () => {
       try {
-        const res = await fetch("https://techfund.net.br/api/fetchFavoritos", {
+        const res = await fetch(`${apiUrl}fetchFavoritos`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id }),
@@ -188,6 +191,7 @@ export default function DashboardScreen() {
 
 
       <View className="h-px mb-4 bg-gray-300 shadow" />
+      <Text className="mb-4 text-xl font-bold text-center text-blue-600">Licitações</Text>
 
       {/* Filtros Ativos + botão */}
       <View className="flex-row flex-wrap items-center gap-2 mb-4">

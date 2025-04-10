@@ -7,6 +7,10 @@ import { loginSuccess } from "../slices/authSlice";
 
 
 export default function LoginScreen() {
+
+ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -15,7 +19,11 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
+<<<<<<< HEAD
+      const response = await fetch(`${apiUrl}auth`, {
+=======
       const response = await fetch("https://techfund.net.br/api/auth", {
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario: username, senha: password }),

@@ -1,9 +1,7 @@
 export default defineEventHandler(async event => {
   const body = await readBody<{ user_id?: number, licitacao_id?: number }>(event)
   const { user_id, licitacao_id } = body
-  console.log('BODY RECEBIDO:', body)
   // Em addFavoritos.post.ts
-  console.log('user_id recebido:', user_id)
 
   if(!user_id || !licitacao_id){
     throw createError({ statusCode: 400, message: 'Parâmetros ausentes' })
