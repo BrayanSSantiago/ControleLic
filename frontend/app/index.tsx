@@ -7,6 +7,10 @@ import { loginSuccess } from "../slices/authSlice";
 
 
 export default function LoginScreen() {
+
+ const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
+
   const dispatch = useDispatch();
 
   const router = useRouter();
@@ -15,7 +19,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch("http://localhost:3000/auth", {
+      const response = await fetch(`${apiUrl}auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario: username, senha: password }),

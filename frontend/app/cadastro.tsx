@@ -3,6 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Image } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function RegisterScreen() {
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -21,7 +24,7 @@ export default function RegisterScreen() {
     }
   
     try {
-      const response = await fetch("http://localhost:3000/cadastro", {
+      const response = await fetch(`${apiUrl}cadastro`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario:username, email:email, senha:password, repetirSenha:confirmPassword }),

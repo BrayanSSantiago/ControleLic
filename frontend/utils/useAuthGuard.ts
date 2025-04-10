@@ -6,20 +6,25 @@ import type { RootState } from "../store"
 export const useAuthGuard = () => {
   const router = useRouter()
   const segments = useSegments()
+
   const user = useSelector((state: RootState) => state.auth.user)
   const token = useSelector((state: RootState) => state.auth.token)
+  const rehydrated = useSelector((state: RootState) => state._persist?.rehydrated)
 
   useEffect(() => {
-    const isLoggedIn = !!token && !!user
+    if (!rehydrated) return // 🔒 Espera até o Redux persistido carregar
 
+    const isLoggedIn = !!token && !!user
     const currentPath = segments.join("/")
 
-    if (!isLoggedIn && currentPath !== "login") {
+    const isLoginPage = currentPath === "" || currentPath === "login"
+
+    if (!isLoggedIn && !isLoginPage) {
       router.replace("/")
     }
 
-    if (isLoggedIn && currentPath === "login") {
+    if (isLoggedIn && isLoginPage) {
       router.replace("/dashboard")
     }
-  }, [token, user, segments])
+  }, [rehydrated, token, user, segments])
 }
