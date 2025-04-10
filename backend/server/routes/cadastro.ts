@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 export default defineEventHandler(async event => {
   const body = await readValidatedBody(event, UsuarioSchema.safeParse)

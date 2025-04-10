@@ -58,7 +58,11 @@ export default function DashboardScreen() {
   // Busca filtros únicos
   const fetchFiltrosDinamicos = async () => {
     try {
+<<<<<<< HEAD
       const res = await fetch(`${apiUrl}filtros`)
+=======
+      const res = await fetch("https://techfund.net.br/api/filtros")
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
       const json = await res.json()
       if (json.success) {
         setFiltrosDinamicos(json.data)
@@ -74,14 +78,22 @@ export default function DashboardScreen() {
       const isFavorito = favoritos.includes(id)
 
       if (isFavorito) {
+<<<<<<< HEAD
         await fetch(`${apiUrl}delFavoritos`, {
+=======
+        await fetch(`https://techfund.net.br/api/delFavoritos`, {
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
         })
         setFavoritos(favoritos.filter(fav => fav !== id))
       } else {
+<<<<<<< HEAD
         await fetch(`${apiUrl}addFavoritos`, {
+=======
+        await fetch("http:https://techfund.net.br/api/addFavoritos", {
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),
@@ -103,7 +115,11 @@ export default function DashboardScreen() {
         limit: "10",
       })
 
+<<<<<<< HEAD
       const response = await fetch(`${apiUrl}licitacoes?${params}`)
+=======
+      const response = await fetch(`https://techfund.net.br/api/licitacoes?${params}`)
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
       const data = await response.json()
       setLicitacoes(data.data || [])
       setTotalPages(data.pagination.totalPages)
@@ -144,7 +160,11 @@ export default function DashboardScreen() {
   useEffect(() => {
     const fetchFavoritos = async () => {
       try {
+<<<<<<< HEAD
         const res = await fetch(`${apiUrl}fetchFavoritos`, {
+=======
+        const res = await fetch("https://techfund.net.br/api/fetchFavoritos", {
+>>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id }),
