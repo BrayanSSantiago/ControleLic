@@ -19,11 +19,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     try {
-<<<<<<< HEAD
       const response = await fetch(`${apiUrl}auth`, {
-=======
-      const response = await fetch("https://techfund.net.br/api/auth", {
->>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario: username, senha: password }),
@@ -41,7 +37,7 @@ export default function LoginScreen() {
       // Armazena o token para autenticação
       dispatch(loginSuccess({
         token: data.token,
-        user: data.usuario // ← agora contém { id, username }
+        user: data.usuario ,// ← agora contém { id, username }
       }))
   
       // Redireciona para o dashboard

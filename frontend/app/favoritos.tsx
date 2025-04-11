@@ -58,11 +58,7 @@ export default function FavoritasScreen() {
   const fetchFavoritas = async () => {
     try {
       setLoading(true)
-<<<<<<< HEAD
       const res = await fetch(`${apiUrl}licitacoesFav`, {
-=======
-      const res = await fetch("https://techfund.net.br/api/licitacoesFav", {
->>>>>>> d5b42c946e8cf05fe5a62d6397703200b46b864d
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id, ...filtrosAtivos }),

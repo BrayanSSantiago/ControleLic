@@ -1,9 +1,10 @@
 import React, { useState } from "react"
-import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native"
+import { View, Text, TextInput, Image, ScrollView, TouchableOpacity, Alert } from "react-native"
 import { useSelector } from "react-redux"
 import type { RootState } from "../store"
 
 export default function Perfil() {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL
   const user = useSelector((state: RootState) => state.auth.user)
 
   const [username, setUsername] = useState(user?.username || "")
@@ -11,9 +12,23 @@ export default function Perfil() {
   const [senha, setSenha] = useState("")
   const [repetirSenha, setRepetirSenha] = useState("")
 
-  const handleSalvar = () => {
-    // aqui você pode fazer sua lógica de atualização
-    console.log({ username, email, senha, repetirSenha })
+  const handleSalvar = async () => {
+    try {
+      const res = await fetch(`${apiUrl}updateUsuario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({id: user?.id, usuario: username, email: email, senha: senha, repetirSenha: repetirSenha,}),
+      })
+
+      const data = await res.json()
+      if (!data.success) {
+        Alert.alert("Erro", data.message || "Erro ao atualizar usuário")
+        return
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar o usuário", error)
+      Alert.alert("Erro", "Erro ao se comunicar com o servidor")
+    }
   }
 
   return (
