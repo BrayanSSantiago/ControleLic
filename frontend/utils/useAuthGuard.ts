@@ -17,7 +17,7 @@ export const useAuthGuard = () => {
     const isLoggedIn = !!token && !!user
     const currentPath = segments.join("/")
 
-    const permitido = currentPath === "" || currentPath === "login" || currentPath === "cadastro"
+    const permitido = currentPath === "" || currentPath === "login" || currentPath === "cadastro" || currentPath === "admin"
     
 
     if (!isLoggedIn && !permitido) {

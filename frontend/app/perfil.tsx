@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux"
 import * as ImagePicker from "expo-image-picker"
 import type { RootState } from "../store"
 import { loginSuccess } from "../slices/authSlice"
+import Navbar from "@/components/navbar"
 
 export default function Perfil() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL
@@ -69,13 +70,23 @@ export default function Perfil() {
 
   return (
     <ScrollView contentContainerStyle={{ padding: 24 }}>
-      <View className="items-center mb-6">
+      <Navbar />
+
+
+      <View className="h-px mb-4 bg-gray-300 shadow" />      <View className="items-center mb-6">
         <TouchableOpacity onPress={escolherImagem}>
           <Image
             source={{
               uri: avatarBase64
                 ? `data:image/jpeg;base64,${avatarBase64}`
                 : user?.avatar || "https://i.pravatar.cc/150?img=3",
+            }}
+            style={{
+              width: 90,
+              height: 80,
+              borderRadius: 40,
+              borderWidth: 1,
+              borderColor: "#1f2937", // cinza escuro
             }}
             className="mb-2 rounded-full w-28 h-28"
           />
