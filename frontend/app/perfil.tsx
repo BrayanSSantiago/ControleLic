@@ -1,51 +1,92 @@
 import React, { useState } from "react"
-import { View, Text, TextInput, Image, ScrollView, TouchableOpacity, Alert } from "react-native"
-import { useSelector } from "react-redux"
+import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native"
+import { useSelector, useDispatch } from "react-redux"
+import * as ImagePicker from "expo-image-picker"
 import type { RootState } from "../store"
+import { loginSuccess } from "../slices/authSlice"
 
 export default function Perfil() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL
+  const dispatch = useDispatch()
+
   const user = useSelector((state: RootState) => state.auth.user)
+  const token = useSelector((state: RootState) => state.auth.token)
 
   const [username, setUsername] = useState(user?.username || "")
   const [email, setEmail] = useState(user?.email || "")
   const [senha, setSenha] = useState("")
   const [repetirSenha, setRepetirSenha] = useState("")
+  const [avatarBase64, setAvatarBase64] = useState<string | null>(null)
+
+  const escolherImagem = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({
+      base64: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    })
+
+    if (!res.canceled && res.assets.length > 0) {
+      setAvatarBase64(res.assets[0].base64 || null)
+    }
+  }
 
   const handleSalvar = async () => {
     try {
-      const res = await fetch(`${apiUrl}updateUsuario`, {
+      await fetch(`${apiUrl}updateUsuario`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({id: user?.id, usuario: username, email: email, senha: senha, repetirSenha: repetirSenha,}),
+        body: JSON.stringify({
+          id: user?.id,
+          usuario: username,
+          email,
+          senha,
+          repetirSenha,
+          avatar: avatarBase64
+            ? `data:image/jpeg;base64,${avatarBase64}`
+            : user?.avatar,
+        }),
       })
 
-      const data = await res.json()
-      if (!data.success) {
-        Alert.alert("Erro", data.message || "Erro ao atualizar usuário")
-        return
-      }
+      // Atualiza os dados na sessão Redux
+      dispatch(
+        loginSuccess({
+          token: token || "",
+          user: {
+            id: Number(user?.id),
+            username,
+            email,
+            avatar: avatarBase64
+              ? `data:image/jpeg;base64,${avatarBase64}`
+              : user?.avatar || " ",
+          },
+        })
+      )
     } catch (error) {
-      console.error("Erro ao atualizar o usuário", error)
-      Alert.alert("Erro", "Erro ao se comunicar com o servidor")
+      console.error("Erro ao salvar perfil:", error)
     }
   }
 
   return (
     <ScrollView contentContainerStyle={{ padding: 24 }}>
-      {/* Avatar centralizado */}
       <View className="items-center mb-6">
-        <Image
-          source={{ uri: user?.avatar || "https://i.pravatar.cc/150?img=3" }}
-          className="mb-4 rounded-full w-28 h-28"
-        />
-        <Text className="text-xl font-bold text-gray-800">{user?.username || "Usuário"}</Text>
+        <TouchableOpacity onPress={escolherImagem}>
+          <Image
+            source={{
+              uri: avatarBase64
+                ? `data:image/jpeg;base64,${avatarBase64}`
+                : user?.avatar || "https://i.pravatar.cc/150?img=3",
+            }}
+            className="mb-2 rounded-full w-28 h-28"
+          />
+          <Text className="text-sm text-center text-blue-600 underline">Alterar Foto</Text>
+        </TouchableOpacity>
+        <Text className="mt-2 text-xl font-bold text-gray-800">{username || "Usuário"}</Text>
       </View>
 
-      {/* Formulário */}
       <View className="space-y-4">
         <View>
-          <Text className="mb-1 text-sm font-medium text-gray-600">Nome de Usuário</Text>
+          <Text className="mb-1 text-sm text-gray-600">Nome de Usuário</Text>
           <TextInput
             value={username}
             onChangeText={setUsername}
@@ -55,19 +96,19 @@ export default function Perfil() {
         </View>
 
         <View>
-          <Text className="mb-1 text-sm font-medium text-gray-600">E-mail</Text>
+          <Text className="mb-1 text-sm text-gray-600">E-mail</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="Digite seu e-mail"
-            className="px-4 py-2 border border-gray-300 rounded"
             keyboardType="email-address"
             autoCapitalize="none"
+            className="px-4 py-2 border border-gray-300 rounded"
           />
         </View>
 
         <View>
-          <Text className="mb-1 text-sm font-medium text-gray-600">Nova Senha</Text>
+          <Text className="mb-1 text-sm text-gray-600">Nova Senha</Text>
           <TextInput
             value={senha}
             onChangeText={setSenha}
@@ -78,7 +119,7 @@ export default function Perfil() {
         </View>
 
         <View>
-          <Text className="mb-1 text-sm font-medium text-gray-600">Repetir Senha</Text>
+          <Text className="mb-1 text-sm text-gray-600">Repetir Senha</Text>
           <TextInput
             value={repetirSenha}
             onChangeText={setRepetirSenha}
@@ -88,10 +129,7 @@ export default function Perfil() {
           />
         </View>
 
-        <TouchableOpacity
-          onPress={handleSalvar}
-          className="py-3 mt-6 bg-blue-600 rounded"
-        >
+        <TouchableOpacity onPress={handleSalvar} className="py-3 mt-6 bg-blue-600 rounded">
           <Text className="font-semibold text-center text-white">Salvar Alterações</Text>
         </TouchableOpacity>
       </View>

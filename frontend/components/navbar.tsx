@@ -61,11 +61,17 @@ export default function Navbar() {
         anchorPosition="bottom"
         anchor={
           <TouchableOpacity onPress={openMenu} className="items-center">
-            <Image
+           <Image
               source={{
                 uri: user?.avatar ?? "https://i.pravatar.cc/150?img=3",
               }}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
+              style={{
+                width: 50,
+                height: 50,
+                borderRadius: 30,
+                borderWidth: 1,
+                borderColor: "#1f2937", // cinza escuro
+              }}
             />
           </TouchableOpacity>
         }

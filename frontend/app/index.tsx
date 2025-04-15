@@ -32,7 +32,6 @@ export default function LoginScreen() {
         return;
       }
   
-      alert("Login realizado com sucesso!");
   
       // Armazena o token para autenticação
       dispatch(loginSuccess({
@@ -45,7 +44,6 @@ export default function LoginScreen() {
   
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      alert("Erro ao conectar ao servidor.");
     }
   };
 

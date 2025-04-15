@@ -8,6 +8,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
+  "dependencies": {
+    "bcryptjs": "^3.0.2"
+  },
   "devDependencies": {
     "@dethdkn/eslint-config": "^2.2.0",
     "@types/bcrypt": "^5.0.2",
@@ -18,8 +21,5 @@
     "nitropack": "latest",
     "sequelize": "^6.37.6",
     "zod": "^3.24.2"
-  },
-  "dependencies": {
-    "bcryptjs": "^3.0.2"
   }
 }
