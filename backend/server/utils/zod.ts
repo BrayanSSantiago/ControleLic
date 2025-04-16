@@ -32,3 +32,11 @@ export const alterarContaParcial = z.object({
     message: 'As senhas não coincidem',
     path: ['repetirSenha'],
   })
+
+export const CriarUsuarioSchema = z.object({
+  usuario: z.string().min(1, { message: 'Usuário é obrigatório' }),
+  email: z.string().email({ message: 'E-mail inválido' }),
+  senha: z.string().min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
+  repetirSenha: z.string().min(1, { message: 'Repita sua senha' }),
+})
+  .refine(data => data.senha === data.repetirSenha, { message: 'As senhas não coincidem', path: ['repetirSenha'] })
