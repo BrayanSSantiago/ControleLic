@@ -36,10 +36,10 @@ export default function LoginScreen() {
       // Armazena o token para autenticação
       dispatch(loginSuccess({
         token: data.token,
-        user: data.usuario ,// ← agora contém { id, username }
+        user: data.usuario ,
       }))
   
-      // Redireciona para o dashboard
+     
       router.push("/dashboard");
   
     } catch (error) {

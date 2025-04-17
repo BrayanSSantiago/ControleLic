@@ -1,7 +1,7 @@
 export default defineEventHandler(async () => {
   try {
     const usuarios = await User.findAll({
-      attributes: ['id', 'username', 'email'], // não retorna senha!
+      attributes: ['id', 'username', 'email', 'cargo'], // não retorna senha!
       order: [['id', 'ASC']],
     })
 

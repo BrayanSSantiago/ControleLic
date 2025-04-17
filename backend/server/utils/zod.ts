@@ -20,6 +20,7 @@ export const alterarContaParcial = z.object({
   senha: z.string().optional().or(z.literal('')),
   repetirSenha: z.string().optional().or(z.literal('')),
   avatar: z.string().optional(),
+  cargo: z.string().optional(),
 
 })
   .refine(data => {

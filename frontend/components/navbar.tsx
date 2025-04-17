@@ -45,19 +45,22 @@ export default function Navbar() {
       <Text className="text-base font-semibold text-blue-700">Licitações</Text>
     </TouchableOpacity>
 
+    
     <TouchableOpacity
       onPress={() => router.push("/favoritos")}
       className="px-3 py-1 bg-blue-100 rounded"
     >
       <Text className="text-base font-semibold text-blue-700">Favoritas</Text>
     </TouchableOpacity>
-
+    {user?.cargo === "Administrador" && (
     <TouchableOpacity
       onPress={() => router.push("/adm")}
       className="px-3 py-1 bg-blue-100 rounded"
     >
       <Text className="text-base font-semibold text-blue-700">Admin</Text>
     </TouchableOpacity>
+      )}
+
   </View>
 
   {/* Avatar completamente à direita */}

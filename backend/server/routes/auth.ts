@@ -22,7 +22,7 @@ export default defineEventHandler(async event => {
     throw createError({ status: 400, message: 'Usuário e/ou senha incorretos' })
   }
 
-  const token = jwt.sign({ usuario: user.username, id: user.id, avatar: user.avatar, email: user.email }, jwtPassword, { expiresIn: '1h' })
+  const token = jwt.sign({ usuario: user.username, id: user.id, avatar: user.avatar, email: user.email, cargo: user.cargo }, jwtPassword, { expiresIn: '1h' })
 
   return {
     message: 'Login realizado com sucesso!',
@@ -32,6 +32,7 @@ export default defineEventHandler(async event => {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      cargo: user.cargo,
     },
   }
 })

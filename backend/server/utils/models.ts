@@ -207,6 +207,8 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   declare email: string
 
   declare avatar?: string
+
+  declare cargo?: string
 }
 
 User.init({
@@ -230,6 +232,10 @@ User.init({
     unique: true,
   },
   avatar: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  cargo: {
     type: DataTypes.STRING,
     allowNull: true,
   },

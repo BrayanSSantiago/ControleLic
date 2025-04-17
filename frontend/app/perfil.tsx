@@ -60,6 +60,7 @@ export default function Perfil() {
             avatar: avatarBase64
               ? `data:image/jpeg;base64,${avatarBase64}`
               : user?.avatar || " ",
+            cargo: user?.cargo || "",
           },
         })
       )

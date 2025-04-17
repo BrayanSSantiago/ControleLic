@@ -13,7 +13,7 @@ export default defineEventHandler(async event => {
       })
     }
 
-    const { id, usuario, email, senha, avatar } = body.data
+    const { id, usuario, email, senha, avatar, cargo } = body.data
 
     const user = await User.findByPk(id)
 
@@ -27,6 +27,7 @@ export default defineEventHandler(async event => {
     if(avatar?.startsWith('data:image')){
       user.avatar = avatar
     }
+    if(cargo) user.cargo = cargo
 
     await user.save()
 
@@ -38,6 +39,7 @@ export default defineEventHandler(async event => {
         username: user.username,
         email: user.email,
         avatar: user.avatar,
+        cargo: user.cargo,
       },
     }
   }
