@@ -81,7 +81,7 @@ export default function DashboardScreen() {
         })
         setFavoritos(favoritos.filter(fav => fav !== id))
       } else {
-        await fetch("http:https://techfund.net.br/api/addFavoritos", {
+        await fetch("https://techfund.net.br/api/addFavoritos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id, licitacao_id: id }),

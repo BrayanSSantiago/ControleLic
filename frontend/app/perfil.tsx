@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import { View, Text, TextInput, Image, ScrollView, TouchableOpacity } from "react-native"
 import { useSelector } from "react-redux"
 import type { RootState } from "../store"
+import Navbar from "../components/navbar"
 
 export default function Perfil() {
   const user = useSelector((state: RootState) => state.auth.user)
@@ -17,7 +18,11 @@ export default function Perfil() {
   }
 
   return (
+    
     <ScrollView contentContainerStyle={{ padding: 24 }}>
+      <Navbar />
+      <View className="h-px mb-4 bg-gray-300 shadow" />
+
       {/* Avatar centralizado */}
       <View className="items-center mb-6">
         <Image
