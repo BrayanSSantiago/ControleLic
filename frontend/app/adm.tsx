@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, TextInput, Modal } from "react-
 import { useSelector } from "react-redux"
 import { useRouter } from "expo-router"
 import type { RootState } from "../store"
-import Navbar from "@/components/navbar"
+import Navbar from "../components/navbar"
 
 export default function Admin() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL
@@ -24,8 +24,9 @@ export default function Admin() {
   })
 
   useEffect(() => {
+    if (!user) return // espera carregar
     if (user?.cargo !== "Administrador") {
-      router.replace("/dashboard")
+     
       return
     }
     fetchUsuarios()

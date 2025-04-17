@@ -12,19 +12,22 @@ export const useAuthGuard = () => {
   const rehydrated = useSelector((state: RootState) => state._persist?.rehydrated)
 
   useEffect(() => {
-    if (!rehydrated) return // 🔒 Espera até o Redux persistido carregar
+    if (!rehydrated) return
 
     const isLoggedIn = !!token && !!user
     const currentPath = segments.join("/")
 
-    const permitido = currentPath === "" || currentPath === "login" || currentPath === "cadastro" || currentPath === "admin"
-    
+    const permitido =
+      currentPath === "" ||
+      currentPath === "login" ||
+      currentPath === "cadastro" ||
+      (currentPath === "adm" && user?.cargo === "Administrador")
 
     if (!isLoggedIn && !permitido) {
       router.replace("/")
     }
 
-    if (isLoggedIn && permitido) {
+    if (isLoggedIn && (currentPath === "" || currentPath === "login" || currentPath === "cadastro")) {
       router.replace("/dashboard")
     }
   }, [rehydrated, token, user, segments])
