@@ -12,3 +12,32 @@ export const UsuarioSchema = z.object({
   repetirSenha: z.string().min(1, { message: 'Repita sua senha' }),
 })
   .refine(data => data.senha === data.repetirSenha, { message: 'As senhas não coincidem', path: ['repetirSenha'] })
+
+export const alterarContaParcial = z.object({
+  id: z.number({ required_error: 'ID do usuário não recebido' }),
+  usuario: z.string().min(1, { message: 'Preencha seu usuário' }).optional(),
+  email: z.string().email({ message: 'Preencha um email válido' }).optional(),
+  senha: z.string().optional().or(z.literal('')),
+  repetirSenha: z.string().optional().or(z.literal('')),
+  avatar: z.string().optional(),
+  cargo: z.string().optional(),
+
+})
+  .refine(data => {
+  // Só valida se ambas as senhas foram fornecidas
+    if(data.senha || data.repetirSenha){
+      return data.senha === data.repetirSenha
+    }
+    return true
+  }, {
+    message: 'As senhas não coincidem',
+    path: ['repetirSenha'],
+  })
+
+export const CriarUsuarioSchema = z.object({
+  usuario: z.string().min(1, { message: 'Usuário é obrigatório' }),
+  email: z.string().email({ message: 'E-mail inválido' }),
+  senha: z.string().min(6, { message: 'A senha deve ter no mínimo 6 caracteres' }),
+  repetirSenha: z.string().min(1, { message: 'Repita sua senha' }),
+})
+  .refine(data => data.senha === data.repetirSenha, { message: 'As senhas não coincidem', path: ['repetirSenha'] })

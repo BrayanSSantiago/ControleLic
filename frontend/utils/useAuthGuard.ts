@@ -17,13 +17,14 @@ export const useAuthGuard = () => {
     const isLoggedIn = !!token && !!user
     const currentPath = segments.join("/")
 
-    const isLoginPage = currentPath === "" || currentPath === "login"
+    const permitido = currentPath === "" || currentPath === "login" || currentPath === "cadastro" || currentPath === "admin"
+    
 
-    if (!isLoggedIn && !isLoginPage) {
+    if (!isLoggedIn && !permitido) {
       router.replace("/")
     }
 
-    if (isLoggedIn && isLoginPage) {
+    if (isLoggedIn && permitido) {
       router.replace("/dashboard")
     }
   }, [rehydrated, token, user, segments])

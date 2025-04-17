@@ -32,20 +32,18 @@ export default function LoginScreen() {
         return;
       }
   
-      alert("Login realizado com sucesso!");
   
       // Armazena o token para autenticação
       dispatch(loginSuccess({
         token: data.token,
-        user: data.usuario // ← agora contém { id, username }
+        user: data.usuario ,
       }))
   
-      // Redireciona para o dashboard
+     
       router.push("/dashboard");
   
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      alert("Erro ao conectar ao servidor.");
     }
   };
 
