@@ -7,15 +7,18 @@ import {
   ScrollView,
   ActivityIndicator,
   Linking,
+  FlatList ,
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useSelector } from "react-redux"
 import FiltroModal from "../components/FiltroModal"
-import Navbar from "../components/navbar"
+import BottomNav from "../components/BottomNav"
+import { useIsMobile } from "@/utils/useIsmobile"
 
 
 export default function DashboardScreen() {
 
+  const isMobile = useIsMobile()
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
  
   const [modalVisible, setModalVisible] = useState(false)
@@ -92,27 +95,38 @@ export default function DashboardScreen() {
       console.error("Erro ao favoritar:", err)
     }
   }
+  const [loadingMore, setLoadingMore] = useState(false)
 
   // Pega licitações
-  const fetchLicitacoes = async () => {
+  const fetchLicitacoes = async (append = false) => {
     try {
-      setLoading(true)
+      append ? setLoadingMore(true) : setLoading(true)
+  
       const params = new URLSearchParams({
         ...filtrosAtivos,
         page: page.toString(),
         limit: "10",
       })
-
+  
       const response = await fetch(`${apiUrl}licitacoes?${params}`)
       const data = await response.json()
-      setLicitacoes(data.data || [])
+  
+      if (append) {
+        setLicitacoes((prev) => [...prev, ...data.data])
+      } else {
+        setLicitacoes(data.data || [])
+      }
+  
       setTotalPages(data.pagination.totalPages)
     } catch (error) {
       console.error("Erro ao buscar licitações:", error)
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
   }
+  
+  
 
   // Aplica os filtros
   const aplicarFiltros = () => {
@@ -122,8 +136,13 @@ export default function DashboardScreen() {
   }
 
   useEffect(() => {
-    fetchLicitacoes()
+    if (page === 1) {
+      fetchLicitacoes(false) // carregamento novo (com filtros)
+    } else {
+      fetchLicitacoes(true)  // scroll: adiciona à lista existente
+    }
   }, [page, filtrosAtivos])
+  
 
   useEffect(() => {
     fetchFiltrosDinamicos()
@@ -187,7 +206,6 @@ export default function DashboardScreen() {
     <View className="flex-1 px-4 pt-12 bg-gray-100">
       {/* Navbar */}
       
-      <Navbar />
 
 
       <View className="h-px mb-4 bg-gray-300 shadow" />
@@ -236,86 +254,82 @@ export default function DashboardScreen() {
       />
 
       {/* Lista */}
-      <ScrollView className="mt-4">
-        {loading ? (
-          <ActivityIndicator size="large" color="#3b82f6" />
-        ) : licitacoes.length === 0 ? (
-          <Text className="text-center text-gray-500">Nenhuma licitação encontrada</Text>
-        ) : (
-          licitacoes.map((edital: any) => (
-            <View key={edital.id} className="relative p-4 mb-4 bg-white rounded-lg shadow" >
-
-               {/* Topo do Card com Número, Estrela e Seta */}
+      {loading ? (
+        <ActivityIndicator size="large" color="#3b82f6" />
+      ) : licitacoes.length === 0 ? (
+        <Text className="text-center text-gray-500">Nenhuma licitação encontrada</Text>
+      ) : (
+        <FlatList
+          data={licitacoes}
+          keyExtractor={(item, index) => `${item.id}-${index}`} // ou qualquer combinação que seja única
+          contentContainerStyle={{ paddingBottom: 120, paddingTop: 16 }}
+          renderItem={({ item }) => (
+            <View className="relative p-4 mb-4 bg-white rounded-lg shadow">
+              {/* Topo do Card */}
               <View className="flex-row items-start justify-between mb-2">
                 <View className="flex-1 pr-2">
-                  <Text className="font-semibold text-gray-700">{edital.numero}</Text>
-                  <Text className="text-gray-500 break-words">Objeto: {edital.objeto}</Text>
+                  <Text className="font-semibold text-gray-700">{item.numero}</Text>
+                  <Text className="text-gray-500 break-words">Objeto: {item.objeto}</Text>
                 </View>
-
+        
                 <View className="flex-row items-start space-x-2">
-                  {/* Ícone de favorito */}
-                  <TouchableOpacity onPress={() => toggleFavorito(edital.id)}>
+                  <TouchableOpacity onPress={() => toggleFavorito(item.id)}>
                     <Ionicons
-                      name={favoritos.includes(edital.id) ? "star" : "star-outline"}
+                      name={favoritos.includes(item.id) ? "star" : "star-outline"}
                       size={24}
-                      color={favoritos.includes(edital.id) ? "#facc15" : "#999"}
+                      color={favoritos.includes(item.id) ? "#facc15" : "#999"}
                     />
                   </TouchableOpacity>
-
-                  {/* Ícone de expandir */}
-                  <TouchableOpacity onPress={() => toggleExpand(edital.id)}>
+        
+                  <TouchableOpacity onPress={() => toggleExpand(item.id)}>
                     <Ionicons
-                      name={expanded[edital.id] ? "chevron-up" : "chevron-down"}
+                      name={expanded[item.id] ? "chevron-up" : "chevron-down"}
                       size={24}
                       color="#666"
                     />
                   </TouchableOpacity>
                 </View>
               </View>
-            
-              {expanded[edital.id] && (
+        
+              {/* Detalhes Expandidos */}
+              {expanded[item.id] && (
                 <View className="mt-4 space-y-1 text-gray-600">
-                  <Text>Data início: {edital.data_inicio_recebimento_propostas}</Text>
-                  <Text>Data fim: {edital.data_fim_recebimento_propostas}</Text>
-                  <Text>Órgão: {edital.orgao}</Text>
-                  <Text>Local: {edital.local}</Text>
-                  <Text>Tipo: {edital.tipo}</Text>
-                  <Text>Valor: R$ {edital.valorLicitacao}</Text>
+                  <Text>Data início: {item.data_inicio_recebimento_propostas}</Text>
+                  <Text>Data fim: {item.data_fim_recebimento_propostas}</Text>
+                  <Text>Órgão: {item.orgao}</Text>
+                  <Text>Local: {item.local}</Text>
+                  <Text>Tipo: {item.tipo}</Text>
+                  <Text>Valor: R$ {item.valorLicitacao}</Text>
                   <View className="flex-row flex-wrap items-center">
                     <Text className="mr-1 text-gray-700">Link:</Text>
-                    <TouchableOpacity onPress={() => Linking.openURL(edital.link)}>
-                      <Text className="text-blue-500 underline">{edital.link}</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(item.link)}>
+                      <Text className="text-blue-500 underline">{item.link}</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
               )}
             </View>
-          ))
-        )}
-      </ScrollView>
+          )}
+          onEndReached={() => {
+            if (!loadingMore && page < totalPages) {
+              setLoadingMore(true)
+              setPage((prev) => prev + 1)
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <View className="items-center py-4">
+                <ActivityIndicator size="small" color="#3b82f6" />
+              </View>
+            ) : null
+          }
+        />
+      )}
 
-      {/* Paginação */}
-      <View className="items-center justify-center mt-4">
-        <View className="flex-row items-center space-x-4">
-          <TouchableOpacity
-            className="px-4 py-2 bg-gray-300 rounded"
-            onPress={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-          >
-            <Text>Anterior</Text>
-          </TouchableOpacity>
-          <Text className="text-sm text-gray-600">
-            Página {page} de {totalPages}
-          </Text>
-          <TouchableOpacity
-            className="px-4 py-2 bg-gray-300 rounded"
-            onPress={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-          >
-            <Text>Próxima</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      
+      <BottomNav />
+
     </View>
   )
 }

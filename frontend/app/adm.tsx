@@ -123,7 +123,6 @@ export default function Admin() {
 
   return (
     <View className="flex-1 px-4 pt-8 bg-white">
-      <Navbar />
       <View className="h-px mb-4 bg-gray-300 shadow" />
 
       <View className="flex-row items-center justify-between mb-2">

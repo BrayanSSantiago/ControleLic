@@ -1,20 +1,24 @@
-import React, { useState } from "react"
+import React from "react"
 import { View, Text, TouchableOpacity, Image } from "react-native"
+import { Menu, Divider } from "react-native-paper"
 import { useRouter } from "expo-router"
+import { useIsMobile } from "../utils/useIsmobile"
 import { useSelector, useDispatch } from "react-redux"
 import { logout } from "../slices/authSlice"
 import type { RootState } from "../store"
-import { Menu, Divider } from "react-native-paper"
 
 export default function Navbar() {
   const router = useRouter()
-  const dispatch = useDispatch()
   const user = useSelector((state: RootState) => state.auth.user)
+  const [menuVisible, setMenuVisible] = React.useState(false)
+  const isMobile = useIsMobile()
 
-  const [menuVisible, setMenuVisible] = useState(false)
+  const dispatch = useDispatch()
 
   const openMenu = () => setMenuVisible(true)
   const closeMenu = () => setMenuVisible(false)
+
+  
 
   const handleLogout = () => {
     dispatch(logout())
@@ -23,48 +27,35 @@ export default function Navbar() {
   }
 
   const handlePerfil = () => {
-    closeMenu()
     router.push("/perfil")
   }
 
   return (
-<View className="flex-row items-center justify-between w-full px-4 mb-4">
-  {/* Logo à esquerda */}
-  <View>
-    <TouchableOpacity onPress={() => router.push("/")}>
-      <Text className="text-2xl font-bold text-blue-600">TechFund</Text>
-    </TouchableOpacity>
-  </View>
+  <View className="flex-row items-center justify-between w-full px-4 mb-5 bg-gray-100">
+      {/* Logo */}
+      <TouchableOpacity onPress={() => router.push("/")}>
+        <Text className="text-2xl font-bold text-blue-600">TechFund</Text>
+      </TouchableOpacity>
 
-  {/* Navegação ao centro */}
-  <View className="flex-row items-center justify-center flex-1 space-x-4">
-    <TouchableOpacity
-      onPress={() => router.push("/dashboard")}
-      className="px-3 py-1 bg-blue-100 rounded"
-    >
-      <Text className="text-base font-semibold text-blue-700">Licitações</Text>
-    </TouchableOpacity>
-
-    
-    <TouchableOpacity
-      onPress={() => router.push("/favoritos")}
-      className="px-3 py-1 bg-blue-100 rounded"
-    >
-      <Text className="text-base font-semibold text-blue-700">Favoritas</Text>
-    </TouchableOpacity>
-    {user?.cargo === "Administrador" && (
-    <TouchableOpacity
-      onPress={() => router.push("/adm")}
-      className="px-3 py-1 bg-blue-100 rounded"
-    >
-      <Text className="text-base font-semibold text-blue-700">Admin</Text>
-    </TouchableOpacity>
+      {/* Botões (visíveis apenas se NÃO for mobile) */}
+      {!isMobile && (
+        <View className="flex-row items-center space-x-4">
+          <TouchableOpacity onPress={() => router.push("/dashboard")} className="px-3 py-1 bg-blue-100 rounded">
+            <Text className="text-base font-semibold text-blue-700">Licitações</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/favoritos")} className="px-3 py-1 bg-blue-100 rounded">
+            <Text className="text-base font-semibold text-blue-700">Favoritas</Text>
+          </TouchableOpacity>
+          {user?.cargo === "Administrador" && (
+            <TouchableOpacity onPress={() => router.push("/adm")} className="px-3 py-1 bg-blue-100 rounded">
+              <Text className="text-base font-semibold text-blue-700">Admin</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       )}
 
-  </View>
-
   {/* Avatar completamente à direita */}
-  <View className="ml-4">
+  <View className="p-4 ml-4">
     <Menu
       visible={menuVisible}
       onDismiss={closeMenu}
@@ -108,6 +99,7 @@ export default function Navbar() {
       />
     </Menu>
   </View>
+
 </View>
 
 

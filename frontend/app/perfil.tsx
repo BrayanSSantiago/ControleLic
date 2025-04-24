@@ -72,7 +72,6 @@ export default function Perfil() {
   return (
     
     <ScrollView contentContainerStyle={{ padding: 24 }}>
-      <Navbar />
 
 
       <View className="h-px mb-4 bg-gray-300 shadow" />      <View className="items-center mb-6">
