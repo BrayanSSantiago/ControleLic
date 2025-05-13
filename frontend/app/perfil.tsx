@@ -74,7 +74,8 @@ export default function Perfil() {
     <ScrollView contentContainerStyle={{ padding: 24 }}>
 
 
-      <View className="h-px mb-4 bg-gray-300 shadow" />      <View className="items-center mb-6">
+      <View className="h-px mb-4 bg-gray-300 shadow" />
+        <View className="items-center mb-6">
         <TouchableOpacity onPress={escolherImagem}>
           <Image
             source={{

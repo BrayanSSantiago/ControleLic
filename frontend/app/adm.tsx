@@ -3,18 +3,18 @@ import { View, Text, TouchableOpacity, FlatList, TextInput, Modal } from "react-
 import { useSelector } from "react-redux"
 import { useRouter } from "expo-router"
 import type { RootState } from "../store"
-import Navbar from "../components/navbar"
+import { useIsMobile } from "@/utils/useIsmobile"
 
 export default function Admin() {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL
   const user = useSelector((state: RootState) => state.auth.user)
   const router = useRouter()
+  const isMobile = useIsMobile()
 
   const [usuarios, setUsuarios] = useState<any[]>([])
   const [modalVisible, setModalVisible] = useState(false)
   const [editando, setEditando] = useState<boolean>(false)
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number | null>(null)
-
   const [formUsuario, setFormUsuario] = useState({
     username: "",
     email: "",
@@ -24,11 +24,8 @@ export default function Admin() {
   })
 
   useEffect(() => {
-    if (!user) return // espera carregar
-    if (user?.cargo !== "Administrador") {
-     
-      return
-    }
+    if (!user) return
+    if (user?.cargo !== "Administrador") return
     fetchUsuarios()
   }, [])
 
@@ -72,12 +69,7 @@ export default function Admin() {
       })
 
       const data = await res.json()
-
-      if (!data.success) {
-        console.error("Erro ao criar usuário:", data.message)
-        return
-      }
-
+      if (!data.success) return console.error("Erro ao criar usuário:", data.message)
       fecharModal()
       fetchUsuarios()
     } catch (error) {
@@ -104,12 +96,8 @@ export default function Admin() {
       })
 
       const json = await res.json()
-
-      if (json.success) {
-        fetchUsuarios()
-      } else {
-        console.error("Erro ao deletar:", json.message)
-      }
+      if (json.success) fetchUsuarios()
+      else console.error("Erro ao deletar:", json.message)
     } catch (error) {
       console.error("Erro na requisição de deleção:", error)
     }
@@ -134,44 +122,61 @@ export default function Admin() {
 
       <View className="w-full h-px mb-2 bg-gray-300" />
 
-      <View className="flex-row items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-t">
-        <Text className="w-1/4 font-semibold text-left text-gray-700">ID</Text>
-        <Text className="w-1/4 font-semibold text-left text-gray-700">Usuário</Text>
-        <Text className="w-1/4 font-semibold text-left text-gray-700">Email</Text>
-        <Text className="w-1/4 font-semibold text-left text-gray-700">Cargo</Text>
-      </View>
-
-      <FlatList
-        data={usuarios}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerStyle={{ paddingBottom: 40 }}
-        renderItem={({ item }) => (
-          <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200">
-            <Text className="w-1/4 text-left text-gray-800">{item.id}</Text>
-            <Text className="w-1/4 text-left text-gray-800">{item.username}</Text>
-            <Text className="w-1/4 text-left text-gray-600">{item.email}</Text>
-            <View className="flex-row justify-between w-1/4">
-              <Text className="text-gray-600">{item.cargo || "-"}</Text>
+      {isMobile ? (
+        <FlatList
+          data={usuarios}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          renderItem={({ item }) => (
+            <View className="px-4 py-3 mb-3 border rounded bg-gray-50">
+              <Text className="font-bold text-gray-800">Usuario: {item.username}</Text>
+              <Text className="mb-2 text-gray-600">Cargo: {item.cargo || '-'}</Text>
               <View className="flex-row space-x-2">
-                <TouchableOpacity
-                  className="px-3 py-1 bg-yellow-400 rounded"
-                  onPress={() => abrirModalEdicao(item)}
-                >
+                <TouchableOpacity className="px-3 py-1 bg-yellow-400 rounded" onPress={() => abrirModalEdicao(item)}>
                   <Text className="text-white">Editar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  className="px-3 py-1 bg-red-500 rounded"
-                  onPress={() => deletarUsuario(item.id)}
-                >
+                <TouchableOpacity className="px-3 py-1 bg-red-500 rounded" onPress={() => deletarUsuario(item.id)}>
                   <Text className="text-white">Deletar</Text>
                 </TouchableOpacity>
               </View>
             </View>
+          )}
+        />
+      ) : (
+        <>
+          <View className="flex-row items-center px-4 py-2 bg-gray-100 border border-gray-300 rounded-t">
+            <Text className="w-1/4 font-semibold text-left text-gray-700">ID</Text>
+            <Text className="w-1/4 font-semibold text-left text-gray-700">Usuário</Text>
+            <Text className="w-1/4 font-semibold text-left text-gray-700">Email</Text>
+            <Text className="w-1/4 font-semibold text-left text-gray-700">Cargo</Text>
           </View>
-        )}
-      />
 
-      {/* Modal */}
+          <FlatList
+            data={usuarios}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 40 }}
+            renderItem={({ item }) => (
+              <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-200">
+                <Text className="w-1/4 text-left text-gray-800">{item.id}</Text>
+                <Text className="w-1/4 text-left text-gray-800">{item.username}</Text>
+                <Text className="w-1/4 text-left text-gray-600">{item.email}</Text>
+                <View className="flex-row justify-between w-1/4">
+                  <Text className="text-gray-600">{item.cargo || "-"}</Text>
+                  <View className="flex-row space-x-2">
+                    <TouchableOpacity className="px-3 py-1 bg-yellow-400 rounded" onPress={() => abrirModalEdicao(item)}>
+                      <Text className="text-white">Editar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity className="px-3 py-1 bg-red-500 rounded" onPress={() => deletarUsuario(item.id)}>
+                      <Text className="text-white">Deletar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            )}
+          />
+        </>
+      )}
+
    {/* Modal */}
     <Modal visible={modalVisible} transparent animationType="slide">
       <View className="justify-center flex-1 px-6 bg-black bg-opacity-40">
@@ -258,7 +263,6 @@ export default function Admin() {
         </View>
       </View>
     </Modal>
-
     </View>
   )
 }

@@ -20,25 +20,25 @@ export default function FiltroModal({ visible, onClose, filtros, setFiltros, apl
   ]
 
   return (
-    <Modal visible={visible} transparent  onRequestClose={onClose}>
-      <ScrollView>
-      <View className="items-center justify-center flex-1 px-4 bg-black bg-opacity-40">
-        <View className="bg-white w-full  max-h-[90%] rounded-lg p-4">
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <Text className="mb-4 text-lg font-bold text-gray-800">Filtros</Text>
+<Modal visible={visible} transparent onRequestClose={onClose} animationType="slide">
+  <View className="items-center justify-center flex-1 px-4 bg-black bg-opacity-40">
+    <View className="bg-white w-full max-h-[90%] rounded-lg p-4 flex-1">
+      <Text className="mb-4 text-lg font-bold text-gray-800">Filtros</Text>
 
-            {/* Objeto */}
-            <View className="p-2 mb-4">
-              <Text className="mb-2 text-sm font-medium text-gray-700 ">Objeto</Text>
-              <TextInput
-                placeholder="Digite um objeto"
-                value={filtros.objeto}
-                onChangeText={(text) => setFiltros({ ...filtros, objeto: text })}
-                className="w-full px-4 py-3 text-sm border border-gray-300 rounded"
-              />
-            </View>
+      {/* ÁREA SCROLLÁVEL */}
+      <View className="flex-1">
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className="p-2 mb-4">
+            <Text className="mb-2 text-sm font-medium text-gray-700">Objeto</Text>
+            <TextInput
+              placeholder="Digite um objeto"
+              value={filtros.objeto}
+              onChangeText={(text) => setFiltros({ ...filtros, objeto: text })}
+              className="w-full px-4 py-3 text-sm border border-gray-300 rounded"
+            />
+          </View>
 
-            <View className="flex-row flex-wrap justify-between gap-4">
+          <View className="flex-row flex-wrap justify-between gap-4">
             {[...Array(3)].map((_, colIndex) => (
               <View key={colIndex} className="w-full sm:w-[30%] p-2">
                 {[
@@ -52,7 +52,7 @@ export default function FiltroModal({ visible, onClose, filtros, setFiltros, apl
                   ["Situação", filtros.situacao, (v: string) => setFiltros({ ...filtros, situacao: v }), filtrosDinamicos.situacao],
                   ["Fonte", filtros.fonte, (v: string) => setFiltros({ ...filtros, fonte: v }), filtrosDinamicos.fonte],
                 ]
-                  .filter((_, i) => i % 3 === colIndex) // Distribui uniformemente nas 3 colunas
+                  .filter((_, i) => i % 3 === colIndex)
                   .map(([label, value, onChange, dados]: any, idx) => (
                     <Filtro
                       key={`${colIndex}-${idx}`}
@@ -65,20 +65,21 @@ export default function FiltroModal({ visible, onClose, filtros, setFiltros, apl
               </View>
             ))}
           </View>
-            {/* Botões */}
-            <View className="flex-row justify-end p-4 mt-6 space-x-4">
-              <TouchableOpacity onPress={onClose} className="px-4 py-2 bg-gray-300 rounded">
-                <Text className="text-gray-800">Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={aplicarFiltros} className="px-4 py-2 bg-blue-500 rounded">
-                <Text className="text-white">Aplicar</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
-        </View>
+        </ScrollView>
       </View>
-      </ScrollView>
-    </Modal>
+
+      {/* BOTÕES FIXOS */}
+      <View className="flex-row justify-end p-4 space-x-4 border-t border-gray-200">
+        <TouchableOpacity onPress={onClose} className="px-4 py-2 bg-gray-300 rounded">
+          <Text className="text-gray-800">Cancelar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={aplicarFiltros} className="px-4 py-2 bg-blue-500 rounded">
+          <Text className="text-white">Aplicar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
   )
 }
 

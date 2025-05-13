@@ -137,14 +137,17 @@ const [loadingMore, setLoadingMore] = useState(false)
   }
 
   useEffect(() => {
-    if (user_id) {
-      setPage(1)
-      fetchFavoritas()
-    }
-  }, [user_id, filtrosAtivos])
+  if (user_id) {
+    setPage(1)
+    setLicitacoes([])
+    setHasMore(true)
+  }
+}, [user_id, filtrosAtivos])
 // useEffect ao paginar
 useEffect(() => {
-  if (page > 1) fetchFavoritas(true)
+  if (user_id) {
+    fetchFavoritas(page > 1) // append é true se estiver paginando
+  }
 }, [page])
 
   useEffect(() => {

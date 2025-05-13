@@ -4,10 +4,9 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   ActivityIndicator,
   Linking,
-  FlatList ,
+  FlatList
 } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { useSelector } from "react-redux"
@@ -15,18 +14,17 @@ import FiltroModal from "../components/FiltroModal"
 import BottomNav from "../components/BottomNav"
 import { useIsMobile } from "@/utils/useIsmobile"
 
-
 export default function DashboardScreen() {
-
   const isMobile = useIsMobile()
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
- 
+
   const [modalVisible, setModalVisible] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [licitacoes, setLicitacoes] = useState<any[]>([])
-  const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({})
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({})
   const [favoritos, setFavoritos] = useState<number[]>([])
 
   const user = useSelector((state: RootState) => state.auth.user)
@@ -58,7 +56,6 @@ export default function DashboardScreen() {
     dataFim: "",
   })
 
-  // Busca filtros únicos
   const fetchFiltrosDinamicos = async () => {
     try {
       const res = await fetch(`${apiUrl}filtros`)
@@ -71,52 +68,25 @@ export default function DashboardScreen() {
     }
   }
 
-  // Alterna favorito
-  const toggleFavorito = async (id: number) => {
-    try {
-      const isFavorito = favoritos.includes(id)
-
-      if (isFavorito) {
-        await fetch(`${apiUrl}delFavoritos`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id, licitacao_id: id }),
-        })
-        setFavoritos(favoritos.filter(fav => fav !== id))
-      } else {
-        await fetch(`${apiUrl}addFavoritos`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id, licitacao_id: id }),
-        })
-        setFavoritos([...favoritos, id])
-      }
-    } catch (err) {
-      console.error("Erro ao favoritar:", err)
-    }
-  }
-  const [loadingMore, setLoadingMore] = useState(false)
-
-  // Pega licitações
-  const fetchLicitacoes = async (append = false) => {
+  const fetchLicitacoes = async (targetPage = 1, append = false) => {
     try {
       append ? setLoadingMore(true) : setLoading(true)
-  
+
       const params = new URLSearchParams({
         ...filtrosAtivos,
-        page: page.toString(),
+        page: targetPage.toString(),
         limit: "10",
       })
-  
+
       const response = await fetch(`${apiUrl}licitacoes?${params}`)
       const data = await response.json()
-  
+
       if (append) {
         setLicitacoes((prev) => [...prev, ...data.data])
       } else {
         setLicitacoes(data.data || [])
       }
-  
+
       setTotalPages(data.pagination.totalPages)
     } catch (error) {
       console.error("Erro ao buscar licitações:", error)
@@ -125,30 +95,63 @@ export default function DashboardScreen() {
       setLoadingMore(false)
     }
   }
-  
-  
 
-  // Aplica os filtros
+  const toggleFavorito = async (id: number) => {
+    try {
+      const isFavorito = favoritos.includes(id)
+      const endpoint = isFavorito ? "delFavoritos" : "addFavoritos"
+      const method = isFavorito ? "DELETE" : "POST"
+
+      await fetch(`${apiUrl}${endpoint}`, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id, licitacao_id: id }),
+      })
+
+      setFavoritos(prev =>
+        isFavorito ? prev.filter(fav => fav !== id) : [...prev, id]
+      )
+    } catch (err) {
+      console.error("Erro ao favoritar:", err)
+    }
+  }
+
   const aplicarFiltros = () => {
     setPage(1)
+    setLicitacoes([])
     setFiltrosAtivos({ ...filtros })
     setModalVisible(false)
   }
 
-  useEffect(() => {
-    if (page === 1) {
-      fetchLicitacoes(false) // carregamento novo (com filtros)
-    } else {
-      fetchLicitacoes(true)  // scroll: adiciona à lista existente
-    }
-  }, [page, filtrosAtivos])
-  
+  const limparFiltro = (campo: string) => {
+    const atualizado = { ...filtrosAtivos, [campo]: "" }
+    setFiltrosAtivos(atualizado)
+    setPage(1)
+    setLicitacoes([])
+  }
+
+  const limparTodos = () => {
+    const limpo: { [key: string]: string } = {}
+    Object.keys(filtrosAtivos).forEach((k) => (limpo[k] = ""))
+    setFiltrosAtivos(limpo)
+    setPage(1)
+    setLicitacoes([])
+  }
+
+  const toggleExpand = (id: string) => {
+    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
 
   useEffect(() => {
     fetchFiltrosDinamicos()
   }, [])
+  
+  useEffect(() => {
+  if (page > 1) {
+    fetchLicitacoes(page, true)
+  }
+}, [page])
 
-  // Garante que os filtros dinâmicos fiquem sincronizados
   useEffect(() => {
     const novos = { ...filtros }
     Object.keys(filtrosDinamicos).forEach((campo) => {
@@ -159,7 +162,6 @@ export default function DashboardScreen() {
     setFiltros(novos)
   }, [filtrosDinamicos])
 
-  // Buscar favoritos do usuário
   useEffect(() => {
     const fetchFavoritos = async () => {
       try {
@@ -168,50 +170,29 @@ export default function DashboardScreen() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ user_id }),
         })
-  
+
         const json = await res.json()
-  
         if (json.success) {
           setFavoritos(json.data || [])
-        } else {
-          console.warn("Resposta de favoritos sem success:", json)
         }
       } catch (err) {
         console.error("Erro ao buscar favoritos:", err)
       }
     }
-  
+
     if (user_id) fetchFavoritos()
   }, [user_id])
 
-  const toggleExpand = (id: string) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
-  }
+  useEffect(() => {
+    fetchLicitacoes(1, false)
+  }, [filtrosAtivos])
 
-  const limparFiltro = (campo: string) => {
-    const atualizado = { ...filtrosAtivos, [campo]: "" }
-    setFiltros(atualizado)
-    setFiltrosAtivos(atualizado)
-    setPage(1)
-  }
-
-  const limparTodos = () => {
-    const limpo: { [key: string]: string } = {}
-    Object.keys(filtrosAtivos).forEach((k) => (limpo[k] = ""))
-    setFiltros(limpo)
-    setFiltrosAtivos(limpo)
-    setPage(1)
-  }
   return (
     <View className="flex-1 px-4 pt-12 bg-gray-100">
-      {/* Navbar */}
-      
-
-
       <View className="h-px mb-4 bg-gray-300 shadow" />
       <Text className="mb-4 text-xl font-bold text-center text-blue-600">Licitações</Text>
 
-      {/* Filtros Ativos + botão */}
+      {/* Filtros Ativos */}
       <View className="flex-row flex-wrap items-center gap-2 mb-4">
         <TouchableOpacity
           className="px-4 py-2 bg-blue-500 rounded"
@@ -222,10 +203,7 @@ export default function DashboardScreen() {
 
         {Object.entries(filtrosAtivos).map(([chave, valor]) =>
           valor ? (
-            <View
-              key={chave}
-              className="flex-row items-center px-3 py-1 bg-gray-200 rounded-full"
-            >
+            <View key={chave} className="flex-row items-center px-3 py-1 bg-gray-200 rounded-full">
               <Text className="mr-2 text-sm text-gray-700">
                 {chave}: {valor}
               </Text>
@@ -243,7 +221,7 @@ export default function DashboardScreen() {
         )}
       </View>
 
-      {/* Modal com filtros */}
+      {/* Modal de Filtros */}
       <FiltroModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -253,7 +231,7 @@ export default function DashboardScreen() {
         aplicarFiltros={aplicarFiltros}
       />
 
-      {/* Lista */}
+      {/* Lista de Licitações */}
       {loading ? (
         <ActivityIndicator size="large" color="#3b82f6" />
       ) : licitacoes.length === 0 ? (
@@ -261,17 +239,18 @@ export default function DashboardScreen() {
       ) : (
         <FlatList
           data={licitacoes}
-          keyExtractor={(item, index) => `${item.id}-${index}`} // ou qualquer combinação que seja única
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          initialNumToRender={10}
+          maxToRenderPerBatch={5}
+          windowSize={5}
           contentContainerStyle={{ paddingBottom: 120, paddingTop: 16 }}
           renderItem={({ item }) => (
             <View className="relative p-4 mb-4 bg-white rounded-lg shadow">
-              {/* Topo do Card */}
               <View className="flex-row items-start justify-between mb-2">
                 <View className="flex-1 pr-2">
                   <Text className="font-semibold text-gray-700">{item.numero}</Text>
                   <Text className="text-gray-500 break-words">Objeto: {item.objeto}</Text>
                 </View>
-        
                 <View className="flex-row items-start space-x-2">
                   <TouchableOpacity onPress={() => toggleFavorito(item.id)}>
                     <Ionicons
@@ -280,7 +259,6 @@ export default function DashboardScreen() {
                       color={favoritos.includes(item.id) ? "#facc15" : "#999"}
                     />
                   </TouchableOpacity>
-        
                   <TouchableOpacity onPress={() => toggleExpand(item.id)}>
                     <Ionicons
                       name={expanded[item.id] ? "chevron-up" : "chevron-down"}
@@ -290,8 +268,7 @@ export default function DashboardScreen() {
                   </TouchableOpacity>
                 </View>
               </View>
-        
-              {/* Detalhes Expandidos */}
+
               {expanded[item.id] && (
                 <View className="mt-4 space-y-1 text-gray-600">
                   <Text>Data início: {item.data_inicio_recebimento_propostas}</Text>
@@ -312,8 +289,7 @@ export default function DashboardScreen() {
           )}
           onEndReached={() => {
             if (!loadingMore && page < totalPages) {
-              setLoadingMore(true)
-              setPage((prev) => prev + 1)
+              setPage(prev => prev + 1) // Só atualiza o state
             }
           }}
           onEndReachedThreshold={0.5}
@@ -326,10 +302,6 @@ export default function DashboardScreen() {
           }
         />
       )}
-
-      
-      <BottomNav />
-
     </View>
   )
 }
